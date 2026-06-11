@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Weekly Pulse — June 8, 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+:root{
+  --bg:#040810;--s1:#080e1c;--s2:#0c1526;
+  --b1:#16253e;--b2:#1f3050;
+  --green:#00ff88;--red:#ef4444;--blue:#38bdf8;--amber:#f59e0b;--purple:#a78bfa;--orange:#f97316;
+  --tx:#e2eaf5;--tx2:#94a3b8;--tx3:#4a6680;
+  --mono:'IBM Plex Mono',monospace;--body:'Inter',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 65% 40% at 12% 8%,rgba(239,68,68,.04) 0%,transparent 55%),radial-gradient(ellipse 55% 35% at 88% 88%,rgba(56,189,248,.03) 0%,transparent 55%);pointer-events:none;z-index:0}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:11px 28px;background:rgba(4,8,16,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--b1);gap:12px;flex-wrap:wrap}
+.hdr-l{display:flex;align-items:center;gap:10px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.brand{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
+.brand-sub{font-family:var(--mono);font-size:.55rem;color:var(--tx3);margin-top:1px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.p{font-family:var(--mono);font-size:.55rem;padding:3px 9px;border-radius:20px;border:1px solid;white-space:nowrap}
+.p-red{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08)}
+.p-amber{border-color:rgba(245,158,11,.4);color:var(--amber);background:rgba(245,158,11,.08)}
+.p-green{border-color:rgba(0,255,136,.35);color:var(--green);background:rgba(0,255,136,.07)}
+.p-blue{border-color:rgba(56,189,248,.35);color:var(--blue);background:rgba(56,189,248,.07)}
+
+/* LAYOUT */
+.main{max-width:1400px;margin:0 auto;padding:22px 28px;position:relative;z-index:1}
+
+/* TICKER */
+.ticker{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:1px;background:var(--b1);border:1px solid var(--b1);border-radius:8px;overflow:hidden;margin-bottom:20px}
+.tick{background:var(--s1);padding:12px 14px}
+.tl{font-family:var(--mono);font-size:.51rem;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.tv{font-size:.92rem;font-weight:600;line-height:1.2}
+.ts{font-family:var(--mono);font-size:.53rem;color:var(--tx3);margin-top:3px}
+
+.up{color:var(--green)!important}.dn{color:var(--red)!important}.flat{color:var(--tx3)!important}.warn{color:var(--amber)!important}.cool{color:var(--blue)!important}.hot{color:var(--orange)!important}
+
+/* SECTION */
+.sec{margin-bottom:26px}
+.sec-title{font-size:.95rem;font-weight:700;letter-spacing:-.01em;margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.sec-sub{font-family:var(--mono);font-size:.55rem;color:var(--tx3);margin-bottom:13px;letter-spacing:.04em}
+
+/* CALLOUT */
+.callout{border-radius:7px;padding:12px 16px;margin-bottom:16px;font-size:.77rem;line-height:1.72}
+.callout strong{font-weight:600}
+.c-red{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2)}.c-red strong{color:var(--red)}
+.c-green{background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.16)}.c-green strong{color:var(--green)}
+.c-amber{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.18)}.c-amber strong{color:var(--amber)}
+.c-blue{background:rgba(56,189,248,.04);border:1px solid rgba(56,189,248,.16)}.c-blue strong{color:var(--blue)}
+
+/* STORY CARDS */
+.stories{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:11px}
+.story{background:var(--s1);border:1px solid var(--b1);border-radius:7px;padding:14px 15px;border-left:3px solid}
+.story.s-red{border-left-color:var(--red)}.story.s-green{border-left-color:var(--green)}
+.story.s-amber{border-left-color:var(--amber)}.story.s-blue{border-left-color:var(--blue)}
+.story.s-orange{border-left-color:var(--orange)}.story.s-purple{border-left-color:var(--purple)}
+.s-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:7px}
+.s-title{font-size:.78rem;font-weight:600;line-height:1.4;flex:1}
+.s-tag{font-family:var(--mono);font-size:.55rem;padding:2px 7px;border-radius:10px;border:1px solid;flex-shrink:0;margin-top:1px}
+.t-dn{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08)}
+.t-up{border-color:rgba(0,255,136,.4);color:var(--green);background:rgba(0,255,136,.08)}
+.t-warn{border-color:rgba(245,158,11,.4);color:var(--amber);background:rgba(245,158,11,.08)}
+.t-hot{border-color:rgba(249,115,22,.4);color:var(--orange);background:rgba(249,115,22,.08)}
+.t-cool{border-color:rgba(56,189,248,.4);color:var(--blue);background:rgba(56,189,248,.08)}
+.s-body{font-size:.72rem;color:var(--tx2);line-height:1.62}
+
+/* ASSET TABLE */
+.tw{background:var(--s1);border:1px solid var(--b1);border-radius:8px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--s2)}
+th{padding:9px 12px;font-family:var(--mono);font-size:.52rem;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);text-align:left;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid rgba(22,37,62,.7);font-size:.77rem;white-space:nowrap}
+tr:hover td{background:rgba(0,255,136,.02)}
+tr:last-child td{border-bottom:none}
+.mono{font-family:var(--mono);font-size:.66rem}
+.cc{display:flex;align-items:center;gap:7px}
+.ci{font-size:.88rem;width:20px;text-align:center}
+.cn{font-weight:600;font-size:.79rem}
+.cs{font-family:var(--mono);font-size:.56rem;color:var(--tx3)}
+.sm-tag{display:inline-block;font-family:var(--mono);font-size:.46rem;padding:1px 5px;border-radius:8px;border:1px solid;margin-left:3px;vertical-align:middle}
+.st-g{border-color:rgba(0,255,136,.4);color:var(--green);background:rgba(0,255,136,.08)}
+.st-r{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08)}
+.sbar{display:flex;align-items:center;gap:5px}
+.sb{flex:1;height:4px;background:var(--s2);border-radius:2px;overflow:hidden;min-width:48px}
+.sf{height:100%;border-radius:2px}
+.sf-bull{background:var(--green)}.sf-bear{background:var(--red)}.sf-neut{background:var(--tx3)}
+
+/* CHARTS */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:4px}
+.cc2{background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:16px}
+.ct{font-size:.8rem;font-weight:600;margin-bottom:2px}
+.cs2{font-family:var(--mono);font-size:.54rem;color:var(--tx3);margin-bottom:13px}
+.cw{position:relative}
+
+/* NARRATIVES */
+.ng{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:9px}
+.nc{background:var(--s1);border:1px solid var(--b1);border-radius:7px;padding:12px 14px}
+.nh{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.ni{font-size:.95rem}.nn{font-size:.8rem;font-weight:600}
+.nr{font-family:var(--mono);font-size:.55rem;margin-left:auto;padding:2px 7px;border-radius:10px;border:1px solid}
+.nr-bull{border-color:rgba(0,255,136,.4);color:var(--green);background:rgba(0,255,136,.08)}
+.nr-bear{border-color:rgba(239,68,68,.4);color:var(--red);background:rgba(239,68,68,.08)}
+.nr-neut{border-color:rgba(148,163,184,.3);color:var(--tx3);background:rgba(148,163,184,.05)}
+.nr-warn{border-color:rgba(245,158,11,.4);color:var(--amber);background:rgba(245,158,11,.08)}
+.nr-hot{border-color:rgba(249,115,22,.4);color:var(--orange);background:rgba(249,115,22,.08)}
+.nb{font-size:.7rem;color:var(--tx2);line-height:1.6}
+
+/* WATCHLIST */
+.wg{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
+.wc{background:var(--s1);border:1px solid var(--b1);border-radius:7px;padding:12px 14px}
+.wp{font-size:1.08rem;font-weight:700;margin-bottom:3px}
+.wr{display:flex;justify-content:space-between;font-size:.68rem;color:var(--tx2);margin-bottom:2px}
+.wl{font-family:var(--mono);font-size:.55rem;color:var(--tx3)}
+.wv{font-family:var(--mono);font-size:.55rem}
+.verdict{margin-top:8px;padding:7px 9px;background:var(--s2);border-radius:5px;font-size:.7rem;line-height:1.55;color:var(--tx2)}
+.verdict strong{font-weight:600}
+
+/* DISC */
+.disc{background:rgba(239,68,68,.03);border:1px solid rgba(239,68,68,.1);border-radius:7px;padding:11px 14px;font-family:var(--mono);font-size:.56rem;color:var(--tx3);line-height:1.75;margin-top:26px}
+@media(max-width:800px){.main{padding:14px 12px}.hdr{padding:9px 12px}.chart-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="dot"></div>
+    <div>
+      <div class="brand">Crypto Weekly Pulse</div>
+      <div class="brand-sub">WEEK OF JUNE 8, 2026 &nbsp;·&nbsp; Yahoo Finance · CoinDesk · CoinGecko · Coinbase · AnalyticsInsight · CoinStats</div>
+    </div>
+  </div>
+  <div class="pills">
+    <div class="p p-red">🩸 BTC 2026 Low $59,100</div>
+    <div class="p p-red">13-Day ETF Outflow $4.33B</div>
+    <div class="p p-amber">F&amp;G: 20 Extreme Fear</div>
+    <div class="p p-blue">Strategy Bought 1,550 BTC Back</div>
+    <div class="p p-green">✓ June 8, 2026</div>
+  </div>
+</header>
+
+<main class="main">
+
+<!-- SNAPSHOT -->
+<section class="sec">
+  <div class="sec-title">📊 Market Snapshot</div>
+  <div class="sec-sub">JUNE 8, 2026 · SOURCES: YAHOO FINANCE · COINDESK · COINGECKO · COINBASE · ANALYTICSINSIGHT</div>
+  <div class="ticker">
+    <div class="tick"><div class="tl">BTC Price</div><div class="tv dn">$63,500</div><div class="ts">Low $59,100 (June 5); recov.</div></div>
+    <div class="tick"><div class="tl">ETH Price</div><div class="tv dn">$1,684</div><div class="ts">Yahoo: $1,690; -32% YTD</div></div>
+    <div class="tick"><div class="tl">Total Mkt Cap</div><div class="tv dn">~$2.35T</div><div class="ts">Down from $2.52T last week</div></div>
+    <div class="tick"><div class="tl">BTC Dominance</div><div class="tv">57.4%</div><div class="ts">Altcoin season absent</div></div>
+    <div class="tick"><div class="tl">Fear &amp; Greed</div><div class="tv dn">~20</div><div class="ts">Extreme Fear (was 28 last wk)</div></div>
+    <div class="tick"><div class="tl">ETF Outflow Streak</div><div class="tv dn">13 Days</div><div class="ts">$4.33B total · record 2026</div></div>
+    <div class="tick"><div class="tl">BTC From ATH</div><div class="tv dn">-42%</div><div class="ts">ATH $109K Jan 2026</div></div>
+    <div class="tick"><div class="tl">HYPE</div><div class="tv warn">$61.56</div><div class="ts">ATH $75.51 on June 2</div></div>
+    <div class="tick"><div class="tl">XLM</div><div class="tv">$0.208</div><div class="ts">Pulling back from $0.29 peak</div></div>
+    <div class="tick"><div class="tl">SpaceX IPO</div><div class="tv hot">June 12</div><div class="ts">SPCX Nasdaq · 18,712 BTC</div></div>
+  </div>
+
+  <div class="callout c-red">
+    <strong>⚡ JUNE 8 CONTEXT — Damage Control Mode:</strong> Bitcoin hit a 2026 low of $59,100 on June 5 — its lowest level since 2024 — before recovering to ~$63,500 this morning. The crash followed the strongest US jobs report in 18 months, which revived Federal Reserve rate-hike expectations, combined with a record 13-session ETF outflow streak totaling $4.33 billion. The Fear &amp; Greed Index plummeted to 12 on June 3 before recovering to ~20 today. Two bullish counter-signals: Strategy bought 1,550 BTC for ~$101M one week after its symbolic sale, reaffirming the corporate accumulation model, and Bitmine made its biggest ETH purchase of 2026, buying 126,971 ETH worth ~$214M. MVRV Z-Score is approaching historical cycle-low territory. SpaceX IPO roadshow opened June 4, with pricing expected June 11 and Nasdaq trading targeting June 12. New Fed Chair Kevin Warsh chairs his first policy meeting on June 16–17 — the next major macro catalyst.
+  </div>
+</section>
+
+<!-- STORIES -->
+<section class="sec">
+  <div class="sec-title">📰 This Week's Big Stories</div>
+  <div class="sec-sub">JUNE 2–8, 2026 · RANKED BY MARKET IMPACT</div>
+  <div class="stories">
+
+    <div class="story s-red">
+      <div class="s-hdr"><div class="s-title">BTC Crashes to 2026 Low $59,100 on Jobs Data + ETF Exodus</div><div class="s-tag t-dn">CRITICAL</div></div>
+      <div class="s-body">Bitcoin crashed to a 2026 low of $59,100 after the strongest US jobs report in 18 months revived rate-hike expectations. Over $1.7 billion in crypto positions were liquidated, and a record 13-day Bitcoin ETF outflow streak reached $4.33 billion. The Fear &amp; Greed Index hit 12 (Extreme Fear) on June 3 — the lowest since the FTX collapse era. BTC is now -42% from its $109K January ATH. Technically, BTC entered the breakdown stage of a bear flag with a measured target near $50K, though the 200-week SMA near $60K is a strong historical support.</div>
+    </div>
+
+    <div class="story s-green">
+      <div class="s-hdr"><div class="s-title">Strategy Buys Back 1,550 BTC — Reaffirms Accumulation Model</div><div class="s-tag t-up">BULLISH</div></div>
+      <div class="s-body">Strategy bought 1,550 bitcoin for approximately $101 million at an average price of $65,332, bringing total holdings to 845,256 BTC, just one week after its symbolic $2.5M sale. The buyback directly countered the bearish narrative that Saylor was abandoning accumulation. Strategy also raised $181 million through stock sales, funding further BTC purchases. The pattern mirrors December 2022: sell small → buy big → bottom signal. MVRV Z-Score approaching historical cycle-low zones reinforces this thesis.</div>
+    </div>
+
+    <div class="story s-green">
+      <div class="s-hdr"><div class="s-title">Bitmine Buys 126,971 ETH — Biggest 2026 Purchase Despite Crash</div><div class="s-tag t-up">BULLISH ETH</div></div>
+      <div class="s-body">Bitmine bought 126,971 ETH last week, worth roughly $214 million at current prices — its biggest ETH purchase of 2026 — despite chairman Tom Lee's earlier calls to slow purchases. ETH RSI reached 21.8 last week — extreme oversold territory. This represents one of the largest single-entity ETH accumulation events of the cycle. Combined with whales buying $322M ETH the prior week, institutional smart money is aggressively accumulating on the dip while retail sentiment is at Extreme Fear.</div>
+    </div>
+
+    <div class="story s-amber">
+      <div class="s-hdr"><div class="s-title">SpaceX IPO Roadshow Opens — June 12 Nasdaq Listing</div><div class="s-tag t-warn">HIGH IMPACT</div></div>
+      <div class="s-body">SpaceX's roadshow opened June 4, with pricing expected June 11 and Nasdaq trading targeting June 12. The $75 billion capital raise is drawing retail and institutional liquidity away from crypto into equities. Buried in the filing: SpaceX holds 18,712 BTC worth approximately $1.29 billion — one of the largest known corporate Bitcoin holders. Analysts warn of "exit liquidity rotation" — investors selling BTC to fund exposure to SpaceX IPO shares. Long-term BTC bullish (SpaceX = BTC endorsement); short-term bearish (capital rotation).</div>
+    </div>
+
+    <div class="story s-amber">
+      <div class="s-hdr"><div class="s-title">CLARITY Act: Garlinghouse vs Dimon — Senate Floor Vote Pending</div><div class="s-tag t-warn">HIGH IMPACT</div></div>
+      <div class="s-body">The CLARITY Act Senate floor vote remains the defining regulatory event of 2026. The White House is targeting a July 4 deadline for the bill to become law. Polymarket puts 2026 passage odds at 59%. Garlinghouse vs Dimon: The CLARITY Act fight nobody's watching — Ripple's CEO and JPMorgan's CEO are publicly clashing over the bill's bank-stablecoin provisions. Standard Chartered projects $4–8 billion in new XRP ETF inflows post-passage. JPMorgan says the bill unlocks the entire altcoin ETF pipeline.</div>
+    </div>
+
+    <div class="story s-blue">
+      <div class="s-hdr"><div class="s-title">New Fed Chair Kevin Warsh — First Meeting June 16–17</div><div class="s-tag t-cool">MACRO</div></div>
+      <div class="s-body">New Fed Chair Kevin Warsh chairs his first policy meeting on June 16–17. That meeting is the next major catalyst. Until then, the $60,000 to $65,000 range defines the trade for Bitcoin. The strong jobs report (strongest in 18 months) has markets pricing in a possible rate hike — which would be highly bearish for crypto. If Warsh signals a pause, expect significant relief rally. Markets are now pricing ~45% odds of a hike at this meeting, up from near-zero two weeks ago.</div>
+    </div>
+
+    <div class="story s-orange">
+      <div class="s-hdr"><div class="s-title">Bybit Launches Tokenized US Stock IPOs — SpaceX, Anthropic</div><div class="s-tag t-hot">STRUCTURAL</div></div>
+      <div class="s-body">Bybit challenges Wall Street with a massive push into tokenized US stock IPOs — retail investors can now buy shares at official underwritten prices through the crypto exchange, bypassing Wall Street's exclusive pre-IPO clubs. SpaceX (SPCX) and Anthropic are the two flagship offerings. Crypto's recovery remains elusive as SpaceX and Anthropic IPOs loom. This is a significant structural development: crypto exchanges are becoming full-service capital markets venues, directly competing with traditional brokerages for IPO allocations.</div>
+    </div>
+
+    <div class="story s-red">
+      <div class="s-hdr"><div class="s-title">HYPE: ATH $75.51 (June 2) → Pullback to $61 This Week</div><div class="s-tag t-warn">PULLBACK</div></div>
+      <div class="s-body">Hyperliquid's all-time high is $75.51, reached on June 2, 2026 — an 18% decline from today's price of ~$61.56. The ATH came the day after markets opened June sharply lower, showing HYPE's decoupling from the broader market. The pullback is healthy after a 178% YTD run. HYPE's market cap is $15.6B with FDV $59.1B. The weekly chart shows a bullish engulfing pattern (CoinGape). RSI neutral at 49. Key support: $55–57. A hold here sets up a retest of $75.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ASSET TABLE -->
+<section class="sec">
+  <div class="sec-title">💹 Asset Prices — Week of June 8</div>
+  <div class="sec-sub">PRICES AS OF JUNE 8, 2026 MORNING ET · COINDESK · YAHOO FINANCE · COINGECKO · COINBASE</div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th>Asset</th><th>Price</th><th>Wk Change</th><th>Mkt Cap</th><th>From ATH</th><th>Sentiment</th><th>Key Level</th><th>Watch This Week</th>
+      </tr></thead>
+      <tbody id="atb"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CHARTS -->
+<section class="sec">
+  <div class="sec-title">📈 Weekly Performance &amp; Macro Context</div>
+  <div class="sec-sub">WEEK-OVER-WEEK CHANGES JUNE 2 → JUNE 8, 2026</div>
+  <div class="chart-row">
+    <div class="cc2">
+      <div class="ct">Weekly Price Change (%)</div>
+      <div class="cs2">% change from June 2 closing prices → June 8 open</div>
+      <div class="cw" style="height:255px"><canvas id="c1"></canvas></div>
+    </div>
+    <div class="cc2">
+      <div class="ct">Narrative Strength This Week (0–10)</div>
+      <div class="cs2">Editor's assessment of narrative momentum · June 8</div>
+      <div class="cw" style="height:255px"><canvas id="c2"></canvas></div>
+    </div>
+  </div>
+  <div class="chart-row">
+    <div class="cc2">
+      <div class="ct">BTC ETF Flows — 2026 Weekly ($B)</div>
+      <div class="cs2">CoinShares data · 13-day outflow streak totals $4.33B · record 2026</div>
+      <div class="cw" style="height:225px"><canvas id="c3"></canvas></div>
+    </div>
+    <div class="cc2">
+      <div class="ct">BTC Price vs Fear &amp; Greed Index — 2026</div>
+      <div class="cs2">BTC weekly close ($K) vs Fear &amp; Greed sentiment (0–100)</div>
+      <div class="cw" style="height:225px"><canvas id="c4"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- NARRATIVES -->
+<section class="sec">
+  <div class="sec-title">🧭 Narrative Tracker</div>
+  <div class="sec-sub">STRENGTH OF MAJOR CRYPTO NARRATIVES THIS WEEK · UPDATED JUNE 8, 2026</div>
+  <div class="ng" id="ng"></div>
+</section>
+
+<!-- WATCHLIST -->
+<section class="sec">
+  <div class="sec-title">👁 Weekly Watchlist</div>
+  <div class="sec-sub">6 HIGHEST-SIGNAL SETUPS HEADING INTO JUNE 8–15, 2026</div>
+  <div class="wg" id="wg"></div>
+</section>
+
+<!-- CATALYSTS -->
+<section class="sec">
+  <div class="sec-title">📅 Catalyst Calendar — June 8–15</div>
+  <div class="sec-sub">EVENTS THAT COULD MOVE MARKETS THIS WEEK</div>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Date</th><th>Event</th><th>Asset(s)</th><th>Impact</th><th>Bull Case</th><th>Bear Case</th></tr></thead>
+      <tbody id="ctb"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="disc">⚠ DISCLAIMER: For informational purposes only. Not financial advice. Data sourced from Yahoo Finance, CoinDesk, CoinGecko, Coinbase, AnalyticsInsight, CoinStats, Investing.com, Bitcoin Magazine as of June 8, 2026. Prices are indicative and change rapidly. Crypto markets are extremely volatile — total loss of capital is possible. Conduct independent research. Claude (Anthropic) is not a registered investment advisor.</div>
+
+</main>
+
+<script>
+const ASSETS = [
+  {i:"₿",n:"Bitcoin",s:"BTC",p:"$63,500",wk:-11,mc:"$1.26T",ath:"-42%",sent:22,key:"$59,100 (2026 low)",watch:"Fed Chair Warsh June 16–17 meeting; SpaceX IPO June 12 capital rotation; ETF outflow streak; 200-wk SMA ~$60K as ultimate support",hot:false},
+  {i:"Ξ",n:"Ethereum",s:"ETH",p:"$1,684",wk:-15,mc:"$203B",ath:"-78%",sent:20,key:"$1,420 support",watch:"Bitmine 126,971 ETH dip-buy signal; RSI 21.8 = extreme oversold; Glamsterdam upgrade; Warsh Fed meeting for rate direction",hot:false},
+  {i:"✕",n:"XRP",s:"XRP",p:"$1.17",wk:-13,mc:"$68B",ath:"-60%",sent:38,key:"$1.10 support (4-mo low)",watch:"CLARITY Act Senate floor vote imminent; White House July 4 deadline; Garlinghouse vs Dimon battle; StanChart $4–8B ETF inflow if passed",hot:false},
+  {i:"◎",n:"Solana",s:"SOL",p:"$66.59",wk:-19,mc:"$38B",ath:"-77%",sent:30,key:"$60 support",watch:"CLARITY Act commodity codification; Alpenglow upgrade timeline; spot ETF queue; ETH/SOL ratio rotation",hot:false},
+  {i:"⬡",n:"BNB",s:"BNB",p:"$589",wk:-8,mc:"$80B",ath:"-38%",sent:34,key:"$560 support",watch:"BSC DeFi TVL resilience; quarterly burn date; Binance volumes amid market stress",hot:false},
+  {i:"🐕",n:"Dogecoin",s:"DOGE",p:"$0.084",wk:-16,mc:"$12.3B",ath:"-80%",sent:24,key:"$0.080 support",watch:"SpaceX IPO June 12 Elon narrative; X Money launch update; meme season revival potential",hot:false},
+  {i:"★",n:"Stellar",s:"XLM",p:"$0.208",wk:-27,mc:"$7.0B",ath:"-78%",sent:45,key:"$0.20 support",watch:"DTCC partnership July pilot date approaching; RSI normalizing after +85% spike; potential re-entry zone forming",hot:false},
+  {i:"💧",n:"HYPE",s:"HYPE",p:"$61.56",wk:-18,mc:"$15.6B",ath:"-18%",sent:55,key:"$55–57 support",watch:"SpaceX SPCX perp volume June 12; ATH $75.51 retest setup; bullish engulfing weekly candle pattern; Bitwise continued buying",hot:true},
+  {i:"🧠",n:"TAO",s:"TAO",p:"~$240",wk:-6,mc:"$2.6B",ath:"-57%",sent:30,key:"$235 support",watch:"AI narrative amid broader crypto weakness; ETF filing decision timeline; subnet health",hot:false},
+  {i:"₳",n:"Cardano",s:"ADA",p:"$0.162",wk:-31,mc:"$5.9B",ath:"-93%",sent:18,key:"Multi-year lows",watch:"Cardano just hit multi-year low (crypto.news June 8); deeply oversold; CLARITY Act commodity confirmation; Midnight sidechain",hot:false},
+  {i:"⬡",n:"Chainlink",s:"LINK",p:"$7.68",wk:-19,mc:"$5.1B",ath:"-86%",sent:28,key:"$7.00 support",watch:"DTCC/XLM deal = LINK oracle demand for tokenized securities; RWA narrative strongest in market; deep discount",hot:false},
+  {i:"🌊",n:"SUI",s:"SUI",p:"~$0.83",wk:-7,mc:"$3.2B",ath:"-84%",sent:26,key:"$0.80 support",watch:"Move L1 ecosystem resilience; gaming/NFT sector; CLARITY Act commodity status",hot:false},
+];
+
+const NARR = [
+  {i:"🏦",n:"RWA Tokenization",r:"STRONG",rc:"nr-bull",b:"DTCC/XLM partnership (July 2026 pilot) remains the most transformational institutional signal of the year. Even as XLM pulled back -27% WoW from its spike, the fundamental catalyst is intact. LINK, XDC benefit as oracle/settlement layers."},
+  {i:"💹",n:"Dip Buying by Institutions",r:"BUILDING",rc:"nr-warn",b:"Strategy: 1,550 BTC buyback ($101M) one week after sale. Bitmine: 126,971 ETH ($214M). Strive: $4.2B Bitcoin raise. Smart money is aggressively buying while Fear &amp; Greed sits at 20. Classic institutional accumulation during retail panic."},
+  {i:"🚀",n:"SpaceX / IPO Rotation",r:"ACTIVE",rc:"nr-hot",b:"SpaceX IPO June 12 is a dual signal: short-term bearish (capital rotation away from crypto) and long-term bullish (SpaceX holds 18,712 BTC, Bybit tokenizing SPCX shares). The crypto-traditional finance convergence trade is live."},
+  {i:"📜",n:"CLARITY Act / Regulation",r:"PENDING",rc:"nr-warn",b:"Senate floor vote imminent. White House July 4 target. Polymarket 59% passage odds. Garlinghouse vs Dimon battle in public. StanChart: $4–8B XRP ETF inflows if passed. JPMorgan: unlocks entire altcoin ETF pipeline. Biggest near-term binary event."},
+  {i:"🏦",n:"Federal Reserve / Macro",r:"BEARISH",rc:"nr-bear",b:"Strongest jobs report in 18 months = rate hike fears resurgent. New Fed Chair Warsh first meeting June 16–17. Markets pricing ~45% hike probability. Rising Treasury yields = structural crypto headwind. Crypto -42% from ATH reflects this."},
+  {i:"💧",n:"DeFi / On-Chain Revenue",r:"NEUTRAL",rc:"nr-neut",b:"HYPE pulled back -18% from its ATH $75.51 (June 2) but remains +143% YTD. Protocol revenue continues generating real fees. Weekly bullish engulfing candle suggests dip-buyers active. Narrative temporarily overshadowed by macro."},
+  {i:"🧠",n:"Decentralized AI",r:"NEUTRAL",rc:"nr-neut",b:"TAO holding relatively well (-6% WoW) vs broader crypto (-15%+ for most assets). AI narrative is resilient but needs a fresh catalyst. Bybit tokenizing Anthropic IPO shares is an interesting adjacent development."},
+  {i:"₿",n:"BTC Safe Haven / Store of Value",r:"TESTED",rc:"nr-bear",b:"BTC hit 2026 low $59,100 as geopolitical tensions escalated — failing again as a safe haven. Three consecutive red monthly candles. Search interest in 'Bitcoin bear market' at 5-year high. The narrative needs MVRV recovery and ETF flow reversal to reassert itself."},
+];
+
+const WATCH = [
+  {i:"₿",n:"Bitcoin",s:"BTC",p:"$63,500",v:"$24B",a:"-42%",verdict:"<strong>200-week SMA at ~$60K is the critical support level.</strong> MVRV Z-Score approaching historical cycle-low zones that preceded 2018, 2022 recoveries. Strategy's 1,550 BTC buyback removes the 'Saylor selling' narrative. Double-bottom formation possible if $59K holds. Key risk: Fed hike June 16.",c:"var(--amber)"},
+  {i:"Ξ",n:"Ethereum",s:"ETH",p:"$1,684",v:"$12B",a:"-78%",verdict:"<strong>RSI 21.8 = extreme oversold.</strong> Bitmine bought $214M ETH at these levels. Whale accumulation $322M prior week. Glamsterdam upgrade coming. At $1,684, ETH is 78% below its ATH — unprecedented for a top-3 asset. Risk: $1,420 break would signal further downside.",c:"var(--blue)"},
+  {i:"✕",n:"XRP",s:"XRP",p:"$1.17",v:"$3.2B",a:"-60%",verdict:"<strong>CLARITY Act Senate vote is the binary event of the week.</strong> Lowest Binance inflows of 2026 (215M XRP) signals supply tightening. White House July 4 deadline creates urgency. If passed: StanChart $4–8B ETF inflows, price target $4–8. If delayed: re-test $1.10 support.",c:"var(--amber)"},
+  {i:"💧",n:"HYPE",s:"HYPE",p:"$61.56",v:"$640M",a:"-18%",verdict:"<strong>Bullish engulfing weekly candle after ATH $75.51 (June 2) pullback.</strong> SpaceX SPCX perp volume spike June 12 is a near-term catalyst. RSI neutral at 49 — room to run. Support $55–57. Bitwise continues buying. Only major crypto within 20% of ATH.",c:"var(--orange)"},
+  {i:"★",n:"Stellar",s:"XLM",p:"$0.208",v:"$890M",a:"-78%",verdict:"<strong>Post-DTCC-spike pullback creating re-entry zone.</strong> RSI normalizing from overbought toward neutral. The fundamental DTCC catalyst (July 2026 first pilot) is unchanged. Target entry: $0.18–0.20. Hold above $0.20 = bullish structure intact.",c:"var(--purple)"},
+  {i:"₳",n:"Cardano",s:"ADA",p:"$0.162",v:"$780M",a:"-93%",verdict:"<strong>Multi-year low — extreme compression.</strong> ADA is 93% below its $2.32 ATH. At this level it is historically at or below realized value. Risk: further capitulation toward $0.14. Opportunity: any positive CLARITY Act news could trigger violent recovery from these levels.",c:"var(--red)"},
+];
+
+const CATS = [
+  {d:"June 11",e:"SpaceX IPO Pricing — $75B raise closes",a:"BTC, DOGE, HYPE (SPCX perp)",im:"🔴 HIGH",bull:"Capital rotation ends; BTC recovers; SPCX perp volume drives HYPE; Elon DOGE narrative peaks",bear:"IPO priced below target; investor disappointment; crypto rotation trade unwinds"},
+  {d:"June 12",e:"SpaceX Nasdaq debut (SPCX)",a:"DOGE, BTC, HYPE",im:"🔴 HIGH",bull:"Successful IPO + Elon narrative = DOGE +15–20%; SpaceX 18,712 BTC holding = BTC bullish framing",bear:"IPO sells off Day 1; SPCX perp liquidations; meme rotation fails"},
+  {d:"June 12–13",e:"CLARITY Act Senate floor vote window",a:"XRP, SOL, ETH, BTC",im:"🔴 CRITICAL",bull:"Bill passes or advances: XRP +30%+; altcoin ETF pipeline opens; entire market rallies",bear:"Delayed further (Dimon opposition) or watered down: XRP -15%; disappointment rally collapses"},
+  {d:"June 16–17",e:"Fed Chair Warsh first FOMC meeting",a:"All crypto (macro)",im:"🔴 CRITICAL",bull:"Warsh signals pause/cut: massive risk-on rally; BTC back toward $70K+",bear:"Rate hike or hawkish tone: BTC tests $55–58K; cascade liquidations; new 2026 lows"},
+  {d:"All week",e:"BTC ETF flow reversal watch",a:"BTC",im:"🟡 MEDIUM",bull:"Outflow streak snaps; net inflows return: institutional confidence signal; $65K+",bear:"14th+ consecutive day of outflows: $5B+ cumulative; narrative collapse; sub-$60K pressure"},
+  {d:"All week",e:"MVRV Z-Score — cycle low signal",a:"BTC (all crypto)",im:"🟡 MEDIUM",bull:"Z-Score hits near-zero (historical buy signal from 2018/2022); smart money accumulation validated",bear:"Z-Score keeps falling; this cycle is different; further downside before recovery"},
+];
+
+/* RENDER */
+function fW(v){if(Math.abs(v)<1)return`<span class="flat">→ Flat</span>`;return v>0?`<span class="up">▲ +${v}%</span>`:`<span class="dn">▼ ${v}%</span>`}
+function sClr(v){return v>55?"sf-bull":v>40?"sf-neut":"sf-bear"}
+
+// asset table
+(function(){
+  const tb=document.getElementById("atb");
+  ASSETS.forEach(a=>{
+    const tr=document.createElement("tr");
+    const tag=a.hot?'<span class="sm-tag st-g">🔥</span>':'';
+    tr.innerHTML=`
+<td><div class="cc"><span class="ci">${a.i}</span><div><div class="cn">${a.n}${tag}</div><div class="cs">${a.s}</div></div></div></td>
+<td class="mono" style="${a.wk<0?"color:var(--red)":a.wk>10?"color:var(--green)":"color:var(--tx3)"}">${a.p}</td>
+<td>${fW(a.wk)}</td>
+<td class="mono">${a.mc}</td>
+<td class="mono" style="color:var(--red)">${a.ath}</td>
+<td><div class="sbar"><div class="sb"><div class="sf ${sClr(a.sent)}" style="width:${a.sent}%"></div></div><span class="mono" style="font-size:.58rem;width:24px;text-align:right">${a.sent}</span></div></td>
+<td class="mono" style="font-size:.62rem;color:var(--tx3)">${a.key}</td>
+<td style="font-size:.68rem;color:var(--tx2);max-width:240px;white-space:normal;line-height:1.4">${a.watch}</td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+// narratives
+(function(){
+  const g=document.getElementById("ng");
+  NARR.forEach(n=>{
+    const d=document.createElement("div");d.className="nc";
+    d.innerHTML=`<div class="nh"><span class="ni">${n.i}</span><span class="nn">${n.n}</span><span class="nr ${n.rc}">${n.r}</span></div><div class="nb">${n.b}</div>`;
+    g.appendChild(d);
+  });
+})();
+
+// watchlist
+(function(){
+  const g=document.getElementById("wg");
+  WATCH.forEach(w=>{
+    const d=document.createElement("div");d.className="wc";
+    d.style.borderTop=`2px solid ${w.c}`;
+    d.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><div><div style="font-weight:600;font-size:.86rem">${w.i} ${w.n}</div><div class="cs" style="margin-top:1px">${w.s}</div></div></div><div class="wp">${w.p}</div><div class="wr"><span class="wl">24H VOL</span><span class="wv">${w.v}</span></div><div class="wr"><span class="wl">FROM ATH</span><span class="wv" style="color:var(--red)">${w.a}</span></div><div class="verdict">${w.verdict}</div>`;
+    g.appendChild(d);
+  });
+})();
+
+// catalysts
+(function(){
+  const tb=document.getElementById("ctb");
+  CATS.forEach(c=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+<td class="mono" style="color:var(--amber);font-size:.62rem">${c.d}</td>
+<td style="font-size:.76rem;font-weight:500;max-width:200px;white-space:normal;line-height:1.4">${c.e}</td>
+<td class="mono" style="color:var(--tx2);font-size:.6rem">${c.a}</td>
+<td style="font-size:.72rem">${c.im}</td>
+<td style="font-size:.68rem;color:var(--green);max-width:190px;white-space:normal;line-height:1.35">▲ ${c.bull}</td>
+<td style="font-size:.68rem;color:var(--red);max-width:190px;white-space:normal;line-height:1.35">▼ ${c.bear}</td>`;
+    tb.appendChild(tr);
+  });
+})();
+
+/* CHARTS */
+const G="#16253e",T="#4a6680",TF={family:"IBM Plex Mono",size:9};
+
+// weekly perf
+new Chart(document.getElementById("c1"),{type:"bar",
+  data:{labels:["BTC","ETH","XRP","SOL","BNB","DOGE","XLM","HYPE","TAO","ADA","LINK","SUI"],
+    datasets:[{data:[-11,-15,-13,-19,-8,-16,-27,-18,-6,-31,-19,-7],borderRadius:3,borderWidth:0,
+      backgroundColor:[-11,-15,-13,-19,-8,-16,-27,-18,-6,-31,-19,-7].map(v=>v>0?"rgba(0,255,136,.7)":"rgba(239,68,68,.65)")}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:T,font:TF},grid:{color:G}},y:{ticks:{color:T,font:TF,callback:v=>v+"%"},grid:{color:G}}}}});
+
+// narrative strength
+new Chart(document.getElementById("c2"),{type:"bar",
+  data:{labels:["Dip Buying","RWA Tokenization","SpaceX/IPO Rotation","CLARITY Act","DeFi/HYPE","Decentralized AI","BTC Store of Value","Macro/Fed Risk"],
+    datasets:[{data:[8.5,7.8,7.2,6.8,5.8,5.2,3.5,9.0],borderRadius:3,borderWidth:0,
+      backgroundColor:["rgba(0,255,136,.72)","rgba(167,139,250,.72)","rgba(249,115,22,.72)","rgba(245,158,11,.68)","rgba(249,115,22,.6)","rgba(0,255,136,.5)","rgba(239,68,68,.55)","rgba(239,68,68,.75)"]}]},
+  options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{min:0,max:10,ticks:{color:T,font:TF},grid:{color:G}},y:{ticks:{color:T,font:{...TF,size:8}},grid:{color:G}}}}});
+
+// ETF flows
+new Chart(document.getElementById("c3"),{type:"bar",
+  data:{labels:["Jan w1","Jan w2","Feb w1","Feb w2","Mar w1","Mar w2","Apr w1","Apr w2","May w1","May w2","May w3","May w4","Jun w1","Jun w2"],
+    datasets:[{label:"Flows ($B)",data:[1.2,2.1,0.4,0.8,1.1,0.6,-0.2,0.86,0.3,-1.26,-1.47,-1.67,-2.10,-0.56],borderRadius:3,borderWidth:0,
+      backgroundColor:[1,1,1,1,1,1,-1,1,1,-1,-1,-1,-1,-1].map(v=>v>0?"rgba(0,255,136,.65)":"rgba(239,68,68,.65)")}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{color:T,font:{...TF,size:7}},grid:{color:G}},y:{ticks:{color:T,font:TF,callback:v=>v+"B"},grid:{color:G}}}}});
+
+// BTC price vs F&G
+new Chart(document.getElementById("c4"),{type:"line",
+  data:{labels:["Jan","Feb","Mar","Apr","May","Jun 1","Jun 5","Jun 8"],
+    datasets:[
+      {label:"BTC Price ($K)",data:[97,88,80,76,77,72,59,63.5],borderColor:"#f59e0b",backgroundColor:"rgba(245,158,11,.08)",borderWidth:2,tension:.4,yAxisID:"y"},
+      {label:"Fear & Greed",data:[45,38,42,40,31,28,12,20],borderColor:"#38bdf8",backgroundColor:"rgba(56,189,248,.08)",borderWidth:2,tension:.4,yAxisID:"y1"}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:"#e2eaf5",font:TF}}},
+    scales:{
+      x:{ticks:{color:T,font:{...TF,size:8}},grid:{color:G}},
+      y:{position:"left",min:50,max:115,ticks:{color:T,font:TF,callback:v=>v+"K"},grid:{color:G},title:{display:true,text:"BTC $K",color:T,font:TF}},
+      y1:{position:"right",min:0,max:100,ticks:{color:T,font:TF},grid:{display:false},title:{display:true,text:"F&G",color:T,font:TF}}}}});
+</script>
+</body>
+</html>
