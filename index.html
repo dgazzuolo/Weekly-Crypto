@@ -1,1016 +1,921 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Weekly Pulse — June 23–26, 2026</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --bg-card: #0f3460;
-    --accent-blue: #00d2ff;
-    --accent-green: #00e676;
-    --accent-red: #ff1744;
-    --accent-yellow: #ffd600;
-    --accent-purple: #7c4dff;
-    --text-primary: #ffffff;
-    --text-secondary: #b0bec5;
-    --border: rgba(0,210,255,0.15);
-  }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-
-  /* NAV */
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(22,33,62,0.97);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 1.5rem;
-    display: flex; align-items: center; gap: 0.25rem;
-    flex-wrap: wrap;
-    min-height: 52px;
-  }
-  nav a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 0.4rem 0.7rem;
-    border-radius: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  nav a:hover { color: var(--accent-blue); background: rgba(0,210,255,0.08); }
-  .nav-brand {
-    color: var(--accent-blue) !important;
-    font-size: 0.9rem !important;
-    margin-right: auto;
-  }
-
-  /* LAYOUT */
-  .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
-
-  /* HEADER */
-  .header {
-    background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #1a1a2e 100%);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem 2.5rem;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute; top: -50%; right: -10%;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(0,210,255,0.06) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .header h1 {
-    font-size: clamp(1.4rem, 3vw, 2.2rem);
-    font-weight: 800;
-    background: linear-gradient(90deg, #00d2ff, #7c4dff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.4rem;
-  }
-  .header-meta {
-    display: flex; gap: 1.5rem; flex-wrap: wrap;
-    color: var(--text-secondary); font-size: 0.85rem;
-  }
-  .header-meta span { display: flex; align-items: center; gap: 0.4rem; }
-  .pulse-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent-green);
-    animation: pulse 2s infinite;
-    display: inline-block;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
-  }
-
-  /* SECTION */
-  section { margin-bottom: 1.5rem; }
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    cursor: pointer; user-select: none;
-    padding: 0.75rem 1rem;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 12px 12px 0 0;
-    transition: background 0.2s;
-  }
-  .section-header:hover { background: rgba(15,52,96,0.6); }
-  .section-header h2 {
-    font-size: 1rem; font-weight: 700;
-    color: var(--accent-blue);
-    display: flex; align-items: center; gap: 0.5rem;
-  }
-  .section-header .toggle { color: var(--text-secondary); font-size: 1.1rem; transition: transform 0.3s; }
-  .section-header.collapsed .toggle { transform: rotate(-90deg); }
-  .section-body {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 12px 12px;
-    padding: 1.25rem;
-    overflow: hidden;
-    transition: max-height 0.4s ease, padding 0.3s;
-    max-height: 9999px;
-  }
-  .section-body.collapsed { max-height: 0; padding-top: 0; padding-bottom: 0; }
-
-  /* MARKET SNAPSHOT */
-  .snapshot-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-  }
-  .snap-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .snap-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
-  .snap-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 0.4rem; }
-  .snap-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); }
-  .snap-sub { font-size: 0.8rem; margin-top: 0.25rem; }
-  .up { color: var(--accent-green); }
-  .down { color: var(--accent-red); }
-  .neutral { color: var(--accent-yellow); }
-  .fng-extreme-fear { color: #ff1744; }
-  .fng-fear { color: #ff6d00; }
-  .fng-neutral { color: #ffd600; }
-  .fng-greed { color: #76ff03; }
-  .fng-extreme-greed { color: #00e676; }
-
-  /* BIG STORIES */
-  .stories-grid { display: grid; gap: 1rem; }
-  .story-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.1rem 1.25rem;
-    border-left: 4px solid var(--accent-blue);
-    transition: transform 0.2s;
-  }
-  .story-card:hover { transform: translateX(3px); }
-  .story-card.high { border-left-color: var(--accent-red); }
-  .story-card.medium { border-left-color: var(--accent-yellow); }
-  .story-card.low { border-left-color: var(--accent-green); }
-  .story-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; }
-  .story-title { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
-  .impact-badge {
-    font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-    padding: 0.2rem 0.5rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0;
-  }
-  .impact-badge.high { background: rgba(255,23,68,0.2); color: #ff1744; border: 1px solid rgba(255,23,68,0.4); }
-  .impact-badge.medium { background: rgba(255,214,0,0.15); color: #ffd600; border: 1px solid rgba(255,214,0,0.3); }
-  .impact-badge.low { background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
-  .story-summary { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-  .story-relevance { font-size: 0.8rem; color: var(--accent-blue); }
-  .story-relevance strong { color: var(--accent-blue); }
-
-  /* ASSET TABLE */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-  thead th {
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em;
-    padding: 0.7rem 0.9rem; text-align: right;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  thead th:first-child { text-align: left; }
-  tbody tr {
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    transition: background 0.15s;
-  }
-  tbody tr:hover { background: rgba(0,210,255,0.04); }
-  tbody td { padding: 0.65rem 0.9rem; text-align: right; }
-  tbody td:first-child { text-align: left; }
-  .asset-name-cell { display: flex; align-items: center; gap: 0.6rem; }
-  .asset-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .asset-name { font-weight: 700; }
-  .asset-ticker { color: var(--text-secondary); font-size: 0.78rem; }
-  .alloc-bar-wrap { display: flex; align-items: center; gap: 0.5rem; justify-content: flex-end; }
-  .alloc-bar { height: 6px; border-radius: 3px; min-width: 4px; }
-
-  /* CHARTS */
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-  .chart-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-  .chart-title {
-    font-size: 0.82rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-secondary);
-    margin-bottom: 1rem; text-align: center;
-  }
-  .chart-container { position: relative; }
-
-  /* NARRATIVE */
-  .narrative-theme {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(124,77,255,0.2), rgba(0,210,255,0.2));
-    border: 1px solid rgba(124,77,255,0.4);
-    border-radius: 8px;
-    padding: 0.4rem 1rem;
-    font-size: 1rem; font-weight: 800;
-    color: var(--accent-blue);
-    margin-bottom: 1rem;
-  }
-  .narrative-block { margin-bottom: 1.25rem; }
-  .narrative-block h3 {
-    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--accent-purple); margin-bottom: 0.5rem;
-  }
-  .narrative-block p { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
-  .action-list { list-style: none; }
-  .action-list li {
-    padding: 0.5rem 0.75rem;
-    margin-bottom: 0.4rem;
-    background: rgba(0,210,255,0.05);
-    border-left: 3px solid var(--accent-blue);
-    border-radius: 0 6px 6px 0;
-    font-size: 0.88rem; color: var(--text-secondary);
-  }
-  .action-list li strong { color: var(--text-primary); }
-
-  /* WATCHLIST */
-  .watchlist-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-  .watch-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-  }
-  .watch-name { font-weight: 800; font-size: 1rem; margin-bottom: 0.25rem; }
-  .watch-price { font-size: 1.2rem; font-weight: 700; color: var(--accent-blue); margin-bottom: 0.5rem; }
-  .watch-target { font-size: 0.8rem; color: var(--accent-green); margin-bottom: 0.5rem; }
-  .watch-reason { font-size: 0.82rem; color: var(--text-secondary); }
-
-  /* CATALYST CALENDAR */
-  .catalyst-list { display: grid; gap: 0.75rem; }
-  .catalyst-item {
-    display: grid;
-    grid-template-columns: 90px 1fr auto;
-    gap: 1rem;
-    align-items: center;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.85rem 1.1rem;
-  }
-  .catalyst-date { font-size: 0.78rem; font-weight: 700; color: var(--accent-yellow); text-align: center; }
-  .catalyst-info .catalyst-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.2rem; }
-  .catalyst-info .catalyst-assets { font-size: 0.78rem; color: var(--text-secondary); }
-  .catalyst-impact { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 4px; text-align: center; white-space: nowrap; }
-  .catalyst-impact.high { background: rgba(255,23,68,0.2); color: #ff1744; border: 1px solid rgba(255,23,68,0.4); }
-  .catalyst-impact.medium { background: rgba(255,214,0,0.15); color: #ffd600; border: 1px solid rgba(255,214,0,0.3); }
-  .catalyst-impact.low { background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3); }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: var(--text-secondary);
-    font-size: 0.78rem;
-    border-top: 1px solid var(--border);
-    margin-top: 2rem;
-  }
-  footer a { color: var(--accent-blue); text-decoration: none; }
-
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .container { padding: 1rem; }
-    .charts-grid { grid-template-columns: 1fr; }
-    .snapshot-grid { grid-template-columns: repeat(2, 1fr); }
-    .catalyst-item { grid-template-columns: 70px 1fr; }
-    .catalyst-impact { display: none; }
-    nav { padding: 0 0.75rem; }
-    nav a { font-size: 0.7rem; padding: 0.3rem 0.5rem; }
-  }
-  @media (max-width: 480px) {
-    .snapshot-grid { grid-template-columns: 1fr 1fr; }
-    .header { padding: 1.25rem; }
-    .header h1 { font-size: 1.2rem; }
-    .story-header { flex-direction: column; gap: 0.4rem; }
-    .catalyst-item { grid-template-columns: 1fr; }
-    .catalyst-date { text-align: left; }
-    nav a { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Weekly Pulse - June 23-29, 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #00d2ff;
+            margin-bottom: 30px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #00d2ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0,210,255,0.5);
+        }
+        .date-range { font-size: 1.2em; color: #b0bec5; margin-bottom: 5px; }
+        .last-updated { font-size: 0.9em; color: #7c7c8a; }
+        nav {
+            background: #0f3460;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        nav ul { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+        nav a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        nav a:hover { background: rgba(0,210,255,0.2); transform: translateY(-2px); }
+        .section {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,210,255,0.1);
+        }
+        h2 {
+            color: #00d2ff;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 { color: #ffd600; font-size: 1.3em; margin: 20px 0 10px 0; }
+        .market-snapshot {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .metric-card {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #00d2ff;
+            transition: transform 0.3s;
+        }
+        .metric-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,210,255,0.3); }
+        .metric-label { font-size: 0.9em; color: #b0bec5; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 1.8em; font-weight: bold; color: #ffffff; }
+        .metric-change { font-size: 0.9em; margin-top: 5px; }
+        .positive { color: #00e676; }
+        .negative { color: #ff1744; }
+        .neutral { color: #ffd600; }
+        .fear-greed-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .extreme-fear { background: #ff1744; color: #ffffff; }
+        .fear { background: #ff9800; color: #000000; }
+        .neutral-indicator { background: #ffd600; color: #000000; }
+        .greed { background: #4caf50; color: #ffffff; }
+        .extreme-greed { background: #00e676; color: #000000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: #0f3460; color: #00d2ff; font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }
+        tr:hover { background: rgba(0,210,255,0.05); }
+        .asset-name { font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .asset-ticker { color: #b0bec5; font-size: 0.9em; }
+        .asset-icon { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 10px 0;
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .story-card {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #7c4dff;
+        }
+        .story-headline { font-size: 1.2em; color: #00d2ff; margin-bottom: 10px; font-weight: bold; }
+        .story-summary { color: #b0bec5; line-height: 1.8; margin-bottom: 10px; }
+        .story-relevance { color: #b0bec5; line-height: 1.8; margin-bottom: 10px; font-size: 0.95em; }
+        .impact-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .impact-high { background: #ff1744; color: #ffffff; }
+        .impact-medium { background: #ff9800; color: #000000; }
+        .impact-low { background: #4caf50; color: #ffffff; }
+        .narrative-box {
+            background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 100%);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid #7c4dff;
+            margin-top: 20px;
+        }
+        .narrative-theme { font-size: 1.5em; color: #ffd600; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .narrative-text { color: #b0bec5; line-height: 1.9; font-size: 1.05em; }
+        .narrative-text p { margin-bottom: 15px; }
+        .watchlist-item {
+            background: #0f3460;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #00e676;
+            gap: 20px;
+        }
+        .watchlist-info h4 { color: #00d2ff; margin-bottom: 5px; }
+        .watchlist-reason { color: #b0bec5; font-size: 0.9em; }
+        .watchlist-price { text-align: right; white-space: nowrap; }
+        .catalyst-item {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffd600;
+        }
+        .catalyst-date { color: #ffd600; font-weight: bold; margin-bottom: 5px; }
+        .catalyst-event { font-size: 1.1em; color: #ffffff; margin-bottom: 8px; }
+        .catalyst-details { color: #b0bec5; font-size: 0.9em; line-height: 1.7; }
+        .action-recommendation {
+            background: linear-gradient(135deg, #00e676 0%, #00d2ff 100%);
+            color: #000000;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.05em;
+        }
+        .section-toggle {
+            cursor: pointer;
+            user-select: none;
+        }
+        .section-toggle::after {
+            content: ' ▼';
+            font-size: 0.7em;
+            color: #b0bec5;
+        }
+        .section-toggle.collapsed::after { content: ' ▶'; }
+        .collapsible-content { transition: all 0.3s ease; }
+        .collapsible-content.hidden { display: none; }
+        .perf-bar {
+            display: inline-block;
+            height: 8px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .market-snapshot { grid-template-columns: 1fr 1fr; }
+            nav ul { flex-direction: column; gap: 10px; }
+            table { font-size: 0.82em; }
+            th, td { padding: 10px 5px; }
+            .watchlist-item { flex-direction: column; align-items: flex-start; }
+            .watchlist-price { text-align: left; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .section { padding: 15px; }
+            h2 { font-size: 1.4em; }
+            .chart-container { height: 300px; }
+            .market-snapshot { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-
-<!-- NAVIGATION -->
-<nav>
-  <a href="#header" class="nav-brand">⚡ Crypto Pulse</a>
-  <a href="#snapshot">Snapshot</a>
-  <a href="#stories">Stories</a>
-  <a href="#portfolio">Portfolio</a>
-  <a href="#charts">Charts</a>
-  <a href="#narrative">Narrative</a>
-  <a href="#watchlist">Watchlist</a>
-  <a href="#catalysts">Catalysts</a>
-</nav>
-
 <div class="container">
 
-  <!-- HEADER -->
-  <div class="header" id="header">
-    <h1>⚡ Crypto Weekly Pulse</h1>
-    <div class="header-meta">
-      <span>📅 Week of June 23–26, 2026</span>
-      <span><span class="pulse-dot"></span> Live as of June 26, 2026 — 07:00 UTC</span>
-      <span>💼 Portfolio: ~$315 | 12 Assets</span>
-      <span>🎯 Hold Until: May 1, 2027</span>
-    </div>
-  </div>
+    <!-- HEADER -->
+    <header>
+        <h1>🚀 Crypto Weekly Pulse</h1>
+        <div class="date-range">Week of June 23–29, 2026</div>
+        <div class="last-updated">Last Updated: Monday, June 29, 2026 | Portfolio Value: ~$315 | Data: Live CoinGecko</div>
+    </header>
 
-  <!-- MARKET SNAPSHOT -->
-  <section id="snapshot">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>📊 Market Snapshot</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="snapshot-grid">
-        <div class="snap-card">
-          <div class="snap-label">Bitcoin (BTC)</div>
-          <div class="snap-value">$59,009</div>
-          <div class="snap-sub down">24h: −2.81% &nbsp;|&nbsp; 7d: −6.25%</div>
-        </div>
-        <div class="snap-card">
-          <div class="snap-label">Ethereum (ETH)</div>
-          <div class="snap-value">$1,530</div>
-          <div class="snap-sub down">24h: −5.34% &nbsp;|&nbsp; 7d: −10.29%</div>
-        </div>
-        <div class="snap-card">
-          <div class="snap-label">Total Market Cap</div>
-          <div class="snap-value">$2.11T</div>
-          <div class="snap-sub down">24h: −2.93%</div>
-        </div>
-        <div class="snap-card">
-          <div class="snap-label">BTC Dominance</div>
-          <div class="snap-value">55.71%</div>
-          <div class="snap-sub neutral">Flight-to-safety elevated</div>
-        </div>
-        <div class="snap-card">
-          <div class="snap-label">Fear &amp; Greed Index</div>
-          <div class="snap-value fng-extreme-fear">13</div>
-          <div class="snap-sub fng-extreme-fear">⚠️ Extreme Fear</div>
-        </div>
-        <div class="snap-card">
-          <div class="snap-label">ETH Dominance</div>
-          <div class="snap-value">8.70%</div>
-          <div class="snap-sub down">Near multi-year lows</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- BIG STORIES -->
-  <section id="stories">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>📰 Big Stories This Week</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="stories-grid">
-
-        <div class="story-card high">
-          <div class="story-header">
-            <div class="story-title">Record $8B Institutional Outflows Hit Bitcoin ETFs &amp; MicroStrategy</div>
-            <span class="impact-badge high">High Impact</span>
-          </div>
-          <div class="story-summary">A record-breaking $8 billion net outflow from Bitcoin ETFs, stablecoins, and MicroStrategy holdings over 30 days has been the dominant bearish force this week. Strategy (formerly MicroStrategy) made its first-ever partial BTC sale, rattling institutional confidence. Analysts attribute the exodus partly to capital rotating into high-profile IPOs like SpaceX and AI/semiconductor stocks.</div>
-          <div class="story-relevance">📌 <strong>Portfolio Impact:</strong> Directly pressures BTC (28% allocation) and ETH (24%). Institutional demand collapse is the primary driver of the current drawdown. Long-term holders should hold firm — ETF outflows historically precede sharp reversals.</div>
-        </div>
-
-        <div class="story-card high">
-          <div class="story-header">
-            <div class="story-title">$10.6B Bitcoin Options Expiry Today — Potential Volatility Reset</div>
-            <span class="impact-badge high">High Impact</span>
-          </div>
-          <div class="story-summary">The largest quarterly Bitcoin options expiry of 2026 (~$10.6B notional) occurs today on Deribit. With ~80% of contracts out-of-the-money and BTC in a "negative gamma" regime, dealers have been amplifying downside moves. Post-expiry, the forced hedging unwinds — analysts see this as a potential "regime reset" that could stabilize or reverse the trend in early July.</div>
-          <div class="story-relevance">📌 <strong>Portfolio Impact:</strong> Critical near-term catalyst for BTC and the entire portfolio. If spot demand returns post-expiry, a short-squeeze setup could trigger a sharp bounce. Watch the $60K level closely next week.</div>
-        </div>
-
-        <div class="story-card medium">
-          <div class="story-header">
-            <div class="story-title">Ethereum Foundation Cuts 20% of Staff, Shifts to Endowment Model</div>
-            <span class="impact-badge medium">Medium Impact</span>
-          </div>
-          <div class="story-summary">The Ethereum Foundation announced a 20% workforce reduction and 40% budget cut, transitioning to a leaner endowment-style operating model. Simultaneously, the Glamsterdam upgrade (targeting H1 2026) is in final testing phases, promising parallel transaction processing and a 200M gas limit. ETH is trading near $1,530, underperforming BTC significantly.</div>
-          <div class="story-relevance">📌 <strong>Portfolio Impact:</strong> Bearish short-term for ETH (24% allocation) due to organizational uncertainty. Long-term, the Glamsterdam upgrade is a major positive catalyst. ETH at current levels may represent a compelling accumulation opportunity for the $30 pending capital.</div>
-        </div>
-
-        <div class="story-card medium">
-          <div class="story-header">
-            <div class="story-title">Solana Alpenglow Consensus Upgrade Targets Q3 2026 Mainnet</div>
-            <span class="impact-badge medium">Medium Impact</span>
-          </div>
-          <div class="story-summary">Solana's Alpenglow upgrade — the most significant consensus overhaul in the network's history — is live on testnet and targeting Q3 2026 mainnet activation. The upgrade replaces Tower BFT with "Votor" and "Rotor" components, reducing transaction finality from 13 seconds to 100–150 milliseconds. MoneyGram also joined Solana as a validator, signaling growing institutional adoption.</div>
-          <div class="story-relevance">📌 <strong>Portfolio Impact:</strong> Bullish for SOL (11% allocation). The Alpenglow upgrade is a major technical catalyst that could reignite interest in Solana's ecosystem. SOL at $66.64 is down 4.21% on the week but holds relative strength vs. other alts.</div>
-        </div>
-
-        <div class="story-card low">
-          <div class="story-header">
-            <div class="story-title">SEC Publishes 2026–2030 Strategic Plan; GENIUS Act Stablecoin Framework Active</div>
-            <span class="impact-badge low">Low Impact</span>
-          </div>
-          <div class="story-summary">The SEC released its 2026–2030 Strategic Plan, formally prioritizing digital assets and signaling a shift from "regulation by enforcement" to principled frameworks. The GENIUS Act stablecoin framework is now active, categorizing stablecoins separately from securities. A joint SEC/CFTC token taxonomy (5 categories) provides clearer rules for the industry.</div>
-          <div class="story-relevance">📌 <strong>Portfolio Impact:</strong> Long-term positive for the entire portfolio. Regulatory clarity reduces systemic risk and opens the door for broader institutional adoption. Particularly positive for XRP (5.5% allocation) and LINK (4.5%) as infrastructure plays.</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- PORTFOLIO ASSET TABLE -->
-  <section id="portfolio">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>💼 Portfolio Asset Table</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Price</th>
-              <th>24h %</th>
-              <th>7d %</th>
-              <th>Market Cap</th>
-              <th>Allocation</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#f7931a"></span><div><div class="asset-name">Bitcoin</div><div class="asset-ticker">BTC</div></div></div></td>
-              <td>$59,009</td>
-              <td class="down">−2.81%</td>
-              <td class="down">−6.25%</td>
-              <td>$1.18T</td>
-              <td><div class="alloc-bar-wrap"><span>28.0%</span><div class="alloc-bar" style="width:56px;background:#f7931a"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#627eea"></span><div><div class="asset-name">Ethereum</div><div class="asset-ticker">ETH</div></div></div></td>
-              <td>$1,530</td>
-              <td class="down">−5.34%</td>
-              <td class="down">−10.29%</td>
-              <td>$184.5B</td>
-              <td><div class="alloc-bar-wrap"><span>24.0%</span><div class="alloc-bar" style="width:48px;background:#627eea"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#00ffa3"></span><div><div class="asset-name">Solana</div><div class="asset-ticker">SOL</div></div></div></td>
-              <td>$66.64</td>
-              <td class="down">−1.38%</td>
-              <td class="down">−4.21%</td>
-              <td>$38.7B</td>
-              <td><div class="alloc-bar-wrap"><span>11.0%</span><div class="alloc-bar" style="width:22px;background:#00ffa3"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#f3ba2f"></span><div><div class="asset-name">BNB</div><div class="asset-ticker">BNB</div></div></div></td>
-              <td>$555.63</td>
-              <td class="down">−1.61%</td>
-              <td class="down">−4.42%</td>
-              <td>$74.9B</td>
-              <td><div class="alloc-bar-wrap"><span>6.0%</span><div class="alloc-bar" style="width:12px;background:#f3ba2f"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#00aae4"></span><div><div class="asset-name">XRP</div><div class="asset-ticker">XRP</div></div></div></td>
-              <td>$1.018</td>
-              <td class="down">−4.72%</td>
-              <td class="down">−11.37%</td>
-              <td>$63.4B</td>
-              <td><div class="alloc-bar-wrap"><span>5.5%</span><div class="alloc-bar" style="width:11px;background:#00aae4"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#e84142"></span><div><div class="asset-name">Avalanche</div><div class="asset-ticker">AVAX</div></div></div></td>
-              <td>$6.03</td>
-              <td class="down">−5.99%</td>
-              <td class="down">−3.66%</td>
-              <td>$2.60B</td>
-              <td><div class="alloc-bar-wrap"><span>5.0%</span><div class="alloc-bar" style="width:10px;background:#e84142"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#2a5ada"></span><div><div class="asset-name">Chainlink</div><div class="asset-ticker">LINK</div></div></div></td>
-              <td>$7.08</td>
-              <td class="down">−4.24%</td>
-              <td class="down">−11.27%</td>
-              <td>$5.30B</td>
-              <td><div class="alloc-bar-wrap"><span>4.5%</span><div class="alloc-bar" style="width:9px;background:#2a5ada"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#b6509e"></span><div><div class="asset-name">Aave</div><div class="asset-ticker">AAVE</div></div></div></td>
-              <td>$82.45</td>
-              <td class="down">−0.47%</td>
-              <td class="up">+11.25%</td>
-              <td>$1.25B</td>
-              <td><div class="alloc-bar-wrap"><span>4.0%</span><div class="alloc-bar" style="width:8px;background:#b6509e"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#0033ad"></span><div><div class="asset-name">Cardano</div><div class="asset-ticker">ADA</div></div></div></td>
-              <td>$0.1400</td>
-              <td class="down">−4.95%</td>
-              <td class="down">−14.64%</td>
-              <td>$5.21B</td>
-              <td><div class="alloc-bar-wrap"><span>4.0%</span><div class="alloc-bar" style="width:8px;background:#0033ad"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#4da2ff"></span><div><div class="asset-name">Sui</div><div class="asset-ticker">SUI</div></div></div></td>
-              <td>$0.6671</td>
-              <td class="down">−1.57%</td>
-              <td class="down">−8.53%</td>
-              <td>$2.69B</td>
-              <td><div class="alloc-bar-wrap"><span>4.0%</span><div class="alloc-bar" style="width:8px;background:#4da2ff"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#c2a633"></span><div><div class="asset-name">Dogecoin</div><div class="asset-ticker">DOGE</div></div></div></td>
-              <td>$0.07324</td>
-              <td class="down">−3.61%</td>
-              <td class="down">−12.30%</td>
-              <td>$11.3B</td>
-              <td><div class="alloc-bar-wrap"><span>2.5%</span><div class="alloc-bar" style="width:5px;background:#c2a633"></div></div></td>
-            </tr>
-            <tr>
-              <td><div class="asset-name-cell"><span class="asset-dot" style="background:#3a9d3f"></span><div><div class="asset-name">Pepe</div><div class="asset-ticker">PEPE</div></div></div></td>
-              <td>$0.0000023</td>
-              <td class="down">−8.42%</td>
-              <td class="down">−19.51%</td>
-              <td>$968M</td>
-              <td><div class="alloc-bar-wrap"><span>1.5%</span><div class="alloc-bar" style="width:3px;background:#3a9d3f"></div></div></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="margin-top:0.75rem;font-size:0.75rem;color:var(--text-secondary);">⭐ AAVE is the week's standout performer (+11.25% 7d). ADA and PEPE are the biggest laggards. All prices as of June 26, 2026.</p>
-    </div>
-  </section>
-
-  <!-- CHARTS -->
-  <section id="charts">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>📈 Interactive Charts</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="charts-grid">
-
-        <!-- Chart 1: Portfolio Allocation Doughnut -->
-        <div class="chart-card">
-          <div class="chart-title">Portfolio Allocation (%)</div>
-          <div class="chart-container" style="height:280px">
-            <canvas id="chartAllocation"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 2: Market Cap Horizontal Bar -->
-        <div class="chart-card">
-          <div class="chart-title">Market Cap Comparison (USD Billions)</div>
-          <div class="chart-container" style="height:280px">
-            <canvas id="chartMcap"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 3: Weekly Performance Vertical Bar -->
-        <div class="chart-card">
-          <div class="chart-title">7-Day Price Performance (%)</div>
-          <div class="chart-container" style="height:280px">
-            <canvas id="chartPerformance"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart 4: Fear & Greed Line -->
-        <div class="chart-card">
-          <div class="chart-title">Fear &amp; Greed Index — 8-Week History</div>
-          <div class="chart-container" style="height:280px">
-            <canvas id="chartFng"></canvas>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NARRATIVE TRACKER -->
-  <section id="narrative">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>🧠 Narrative Tracker</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="narrative-theme">⚠️ Weekly Theme: "Capitulation &amp; Extreme Fear"</div>
-
-      <div class="narrative-block">
-        <h3>📖 Market Thesis</h3>
-        <p>The crypto market is experiencing a textbook capitulation phase, with the Fear &amp; Greed Index hitting 13 — deep in "Extreme Fear" territory — and the total market cap shedding roughly $300B from recent highs. The confluence of record institutional ETF outflows ($8B+), a massive quarterly options expiry ($10.6B), macro headwinds from elevated PCE inflation, and geopolitical uncertainty (US-Iran tensions) has created a perfect storm of selling pressure. Bitcoin is testing critical support near $58K–$59K, while altcoins are experiencing amplified drawdowns of 10–20%. Historically, Extreme Fear readings below 15 have marked major accumulation zones for patient long-term investors — the last comparable reading preceded a 40%+ rally within 60 days.</p>
-      </div>
-
-      <div class="narrative-block">
-        <h3>🎯 Strategic Implications for Your Portfolio</h3>
-        <p>With a hold horizon until May 1, 2027 (~10 months), the current drawdown is noise within the larger trend. Your portfolio's 52% core allocation (BTC + ETH) provides a defensive anchor, while the altcoin positions are experiencing typical risk-off amplification. AAVE's +11.25% weekly performance stands out as a notable divergence — DeFi fundamentals (Morpho's $175M raise, Aave v4 development) are attracting capital even in a down market. The post-options-expiry period (starting today) historically sees reduced forced selling, which could stabilize prices heading into July. The Solana Alpenglow upgrade (Q3 2026) and Ethereum Glamsterdam (H1 2026) remain powerful medium-term catalysts for your SOL and ETH positions.</p>
-      </div>
-
-      <div class="narrative-block">
-        <h3>⚡ Action Recommendations</h3>
-        <ul class="action-list">
-          <li><strong>HOLD all positions.</strong> Do not panic-sell into Extreme Fear. Your May 2027 horizon means you have 10+ months for recovery. Capitulation phases are temporary.</li>
-          <li><strong>Deploy $30 pending capital strategically.</strong> Consider splitting: ~$15 into BTC (core conviction, near support), ~$10 into ETH (Glamsterdam catalyst, near multi-year lows vs BTC), ~$5 into SOL (Alpenglow upgrade Q3 2026). Use Kraken for lowest fees.</li>
-          <li><strong>Watch AAVE closely.</strong> The only green asset this week (+11.25%) — DeFi sector showing relative strength. Morpho's $175M raise signals institutional DeFi confidence. Consider adding to AAVE position if it holds above $80.</li>
-          <li><strong>Monitor $58K BTC support.</strong> If BTC breaks below $58K convincingly, consider pausing new purchases until stabilization. Post-options-expiry (today) is the key inflection point.</li>
-          <li><strong>Avoid DOGE and PEPE additions.</strong> Meme coins are the worst performers (−12% to −20% weekly). These are speculative holds only — no new capital here until market sentiment improves.</li>
-          <li><strong>Platform note:</strong> All new purchases via Kraken (lowest fees). XRP and BNB additions via Uphold if needed.</li>
+    <!-- NAVIGATION -->
+    <nav>
+        <ul>
+            <li><a href="#snapshot">📊 Market Snapshot</a></li>
+            <li><a href="#stories">📰 Big Stories</a></li>
+            <li><a href="#portfolio">💼 Portfolio</a></li>
+            <li><a href="#charts">📈 Charts</a></li>
+            <li><a href="#narrative">📖 Narrative</a></li>
+            <li><a href="#watchlist">👀 Watchlist</a></li>
+            <li><a href="#catalysts">📅 Catalysts</a></li>
         </ul>
-      </div>
-    </div>
-  </section>
+    </nav>
 
-  <!-- WATCHLIST -->
-  <section id="watchlist">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>👁️ Watchlist</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Assets not currently held but worth monitoring for potential future entry.</p>
-      <div class="watchlist-grid">
-
-        <div class="watch-card">
-          <div class="watch-name">⚡ Arbitrum (ARB)</div>
-          <div class="watch-price">~$0.28</div>
-          <div class="watch-target">🎯 Buy Target: $0.20–$0.25</div>
-          <div class="watch-reason">Leading Ethereum L2 with strong DeFi TVL. Glamsterdam upgrade could boost L2 activity. Token unlock July 16 may create a dip-buy opportunity. Available on Kraken.</div>
+    <!-- SECTION 1: MARKET SNAPSHOT -->
+    <section id="snapshot" class="section">
+        <h2 class="section-toggle">📊 Market Snapshot</h2>
+        <div class="collapsible-content">
+            <div class="market-snapshot">
+                <div class="metric-card">
+                    <div class="metric-label">Bitcoin (BTC)</div>
+                    <div class="metric-value">$59,831</div>
+                    <div class="metric-change negative">▼ 0.61% (24h)</div>
+                    <div class="metric-change negative">▼ 6.61% (7d)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Ethereum (ETH)</div>
+                    <div class="metric-value">$1,569</div>
+                    <div class="metric-change negative">▼ 0.61% (24h)</div>
+                    <div class="metric-change negative">▼ 10.19% (7d)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Market Cap</div>
+                    <div class="metric-value">$2.15T</div>
+                    <div class="metric-change negative">▼ 0.55% (24h)</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">BTC Dominance</div>
+                    <div class="metric-value">55.8%</div>
+                    <div class="metric-change neutral">Bitcoin Season</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Fear &amp; Greed Index</div>
+                    <div class="metric-value">12 / 100</div>
+                    <span class="fear-greed-indicator extreme-fear">⚠ EXTREME FEAR</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">24h Volume</div>
+                    <div class="metric-value">$59.4B</div>
+                    <div class="metric-change neutral">Global Crypto</div>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="watch-card">
-          <div class="watch-name">🔷 Aptos (APT)</div>
-          <div class="watch-price">~$4.20</div>
-          <div class="watch-target">🎯 Buy Target: $3.50–$4.00</div>
-          <div class="watch-reason">Move-language L1 with growing DeFi ecosystem. Competing with SUI in the same niche. Token unlock July 12 could provide entry. Moderate risk profile fits portfolio.</div>
+    <!-- SECTION 2: BIG STORIES -->
+    <section id="stories" class="section">
+        <h2 class="section-toggle">📰 Big Stories This Week</h2>
+        <div class="collapsible-content">
+
+            <div class="story-card">
+                <div class="story-headline">🔴 Bitcoin on Track for Back-to-Back Quarterly Loss — Down ~12% in Q2</div>
+                <div class="story-summary">
+                    Bitcoin is heading for its second consecutive quarterly decline, dropping approximately 12% in Q2 2026 following a 22% fall in Q1. The asset has struggled to reclaim the $60,000 level amid persistent macro headwinds, with the Fear &amp; Greed Index hitting 12 (Extreme Fear) — the lowest reading in months. Spot Bitcoin ETFs recorded their worst month on record in June, with $4 billion in outflows, removing a critical institutional buying pillar.
+                </div>
+                <div class="story-relevance">
+                    <strong>📌 Portfolio Relevance:</strong> BTC is your largest holding. Two consecutive down quarters represent a significant drawdown from the Oct 2025 ATH (~$126K). However, your May 2027 hold horizon means you have time for recovery. Historically, back-to-back quarterly losses have often preceded strong rebounds.
+                </div>
+                <span class="impact-badge impact-high">HIGH IMPACT</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-headline">🇪🇺 MiCA Full Implementation: July 1, 2026 Deadline Reshapes European Crypto</div>
+                <div class="story-summary">
+                    The EU's Markets in Crypto-Assets (MiCA) regulation takes full effect on July 1, 2026. Only 17% of previously registered European firms have achieved full authorization. Binance has suspended certain services in key EU nations after failing to secure a license. ESMA has called for unauthorized firms to wind down operations, triggering a major reshuffling of European crypto market share toward compliant platforms.
+                </div>
+                <div class="story-relevance">
+                    <strong>📌 Portfolio Relevance:</strong> Medium-term bullish for compliant assets like BTC, ETH, XRP, and BNB, which are held on regulated platforms. Regulatory clarity in Europe mirrors the U.S. SEC/CFTC framework established in March 2026, reducing systemic risk for your core holdings.
+                </div>
+                <span class="impact-badge impact-high">HIGH IMPACT</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-headline">🏦 SharpLink Gaming Accumulates 40,000 ETH — Institutional Bet on Ethereum</div>
+                <div class="story-summary">
+                    Despite ETH's 10% weekly decline, SharpLink Gaming (backed by Ethlabs and Joe Lubin) purchased nearly 40,000 ETH over a three-day period, signaling strong institutional conviction in Ethereum's long-term value. This accumulation occurred while retail sentiment remained deeply fearful, a classic "smart money vs. retail" divergence pattern.
+                </div>
+                <div class="story-relevance">
+                    <strong>📌 Portfolio Relevance:</strong> Directly bullish for your ETH position. Institutional accumulation at current prices validates the long-term thesis. ETH's Glamsterdam upgrade (H1 2026) and Hegotá (H2 2026) provide strong technical catalysts ahead.
+                </div>
+                <span class="impact-badge impact-high">HIGH IMPACT</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-headline">⚖️ U.S. CLARITY Act Faces August Recess Deadline — Market Structure Bill at Risk</div>
+                <div class="story-summary">
+                    The Digital Asset Market Clarity (CLARITY) Act, which advanced through the Senate Banking Committee in May 2026, faces a critical legislative window before the August congressional recess. Industry analysts warn that failure to pass the bill before recess could delay comprehensive U.S. crypto market structure legislation until 2030. The bill aims to formally clarify SEC vs. CFTC jurisdiction over digital assets.
+                </div>
+                <div class="story-relevance">
+                    <strong>📌 Portfolio Relevance:</strong> Passage would be a major structural catalyst for all 12 holdings, particularly BTC, ETH, SOL, and XRP. Delay creates continued regulatory uncertainty but does not change the fundamental investment thesis for your long-term hold strategy.
+                </div>
+                <span class="impact-badge impact-medium">MEDIUM IMPACT</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-headline">🌍 Geopolitical Risk &amp; Macro Pressure: US-Iran Tensions Weigh on Risk Assets</div>
+                <div class="story-summary">
+                    Renewed US–Iran geopolitical tensions contributed to a broad risk-off environment across global markets in late June 2026. Combined with upcoming US unemployment data and nonfarm payrolls (early July), markets are in a cautious holding pattern. The Federal Reserve's policy stance remains a key variable, with rate expectations influencing crypto sentiment significantly.
+                </div>
+                <div class="story-relevance">
+                    <strong>📌 Portfolio Relevance:</strong> Short-term headwind for all risk assets including crypto. Your diversified 12-asset portfolio provides some buffer. BTC's relative strength (only -6.6% vs ETH's -10.2% weekly) confirms its safe-haven status within crypto during risk-off periods.
+                </div>
+                <span class="impact-badge impact-medium">MEDIUM IMPACT</span>
+            </div>
+
         </div>
+    </section>
 
-        <div class="watch-card">
-          <div class="watch-name">🌊 Morpho (MORPHO)</div>
-          <div class="watch-price">~$1.85</div>
-          <div class="watch-target">🎯 Buy Target: $1.50–$1.70</div>
-          <div class="watch-reason">Just raised $175M at $2B valuation (a16z, Paradigm). Largest DeFi funding round ever. Programmable credit protocol with institutional backing. High conviction DeFi play.</div>
+    <!-- SECTION 3: PORTFOLIO ASSET TABLE -->
+    <section id="portfolio" class="section">
+        <h2 class="section-toggle">💼 Portfolio Holdings</h2>
+        <div class="collapsible-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Asset</th>
+                        <th>Price (USD)</th>
+                        <th>24h %</th>
+                        <th>7d %</th>
+                        <th>Market Cap</th>
+                        <th>Allocation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#f7931a;"></span>Bitcoin <span class="asset-ticker">(BTC)</span></div></td>
+                        <td>$59,831</td>
+                        <td class="negative">▼ 0.61%</td>
+                        <td class="negative">▼ 6.61%</td>
+                        <td>$1.20T</td>
+                        <td>~30% ⭐ Core</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#627eea;"></span>Ethereum <span class="asset-ticker">(ETH)</span></div></td>
+                        <td>$1,569</td>
+                        <td class="negative">▼ 0.61%</td>
+                        <td class="negative">▼ 10.19%</td>
+                        <td>$189.4B</td>
+                        <td>~25% ⭐ Core</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#00ffa3;"></span>Solana <span class="asset-ticker">(SOL)</span></div></td>
+                        <td>$72.45</td>
+                        <td class="positive">▲ 1.15%</td>
+                        <td class="negative">▼ 1.67%</td>
+                        <td>$42.1B</td>
+                        <td>~11% Mid</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#f3ba2f;"></span>BNB <span class="asset-ticker">(BNB)</span></div></td>
+                        <td>$551.06</td>
+                        <td class="negative">▼ 0.77%</td>
+                        <td class="negative">▼ 6.85%</td>
+                        <td>$74.3B</td>
+                        <td>~6% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#00aae4;"></span>XRP <span class="asset-ticker">(XRP)</span></div></td>
+                        <td>$1.048</td>
+                        <td class="positive">▲ 0.17%</td>
+                        <td class="negative">▼ 7.53%</td>
+                        <td>$65.2B</td>
+                        <td>~5% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#b6509e;"></span>Aave <span class="asset-ticker">(AAVE)</span></div></td>
+                        <td>$92.18</td>
+                        <td class="positive">▲ 3.90%</td>
+                        <td class="positive">▲ 21.77%</td>
+                        <td>$1.40B</td>
+                        <td>~5% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#2a5ada;"></span>Chainlink <span class="asset-ticker">(LINK)</span></div></td>
+                        <td>$7.29</td>
+                        <td class="positive">▲ 0.65%</td>
+                        <td class="negative">▼ 8.81%</td>
+                        <td>$5.45B</td>
+                        <td>~4% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#0033ad;"></span>Cardano <span class="asset-ticker">(ADA)</span></div></td>
+                        <td>$0.1442</td>
+                        <td class="negative">▼ 0.45%</td>
+                        <td class="negative">▼ 9.97%</td>
+                        <td>$5.37B</td>
+                        <td>~4% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#4da2ff;"></span>SUI <span class="asset-ticker">(SUI)</span></div></td>
+                        <td>$0.6862</td>
+                        <td class="positive">▲ 0.06%</td>
+                        <td class="negative">▼ 3.50%</td>
+                        <td>$2.76B</td>
+                        <td>~4% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#e84142;"></span>Avalanche <span class="asset-ticker">(AVAX)</span></div></td>
+                        <td>$6.54</td>
+                        <td class="positive">▲ 3.53%</td>
+                        <td class="positive">▲ 4.35%</td>
+                        <td>$2.82B</td>
+                        <td>~3% Smaller</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#c2a633;"></span>Dogecoin <span class="asset-ticker">(DOGE)</span></div></td>
+                        <td>$0.07246</td>
+                        <td class="negative">▼ 1.17%</td>
+                        <td class="negative">▼ 13.26%</td>
+                        <td>$11.2B</td>
+                        <td>~2% Meme</td>
+                    </tr>
+                    <tr>
+                        <td><div class="asset-name"><span class="asset-icon" style="background:#3a9d3f;"></span>PEPE <span class="asset-ticker">(PEPE)</span></div></td>
+                        <td>$0.00000234</td>
+                        <td class="negative">▼ 2.53%</td>
+                        <td class="negative">▼ 17.76%</td>
+                        <td>$982M</td>
+                        <td>~1% Meme</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="color:#b0bec5; font-size:0.85em; margin-top:12px;">* Allocation % are approximate estimates based on tier weighting. Prices from CoinGecko as of June 29, 2026.</p>
         </div>
+    </section>
 
-        <div class="watch-card">
-          <div class="watch-name">🔗 Lido (LDO)</div>
-          <div class="watch-price">~$0.65</div>
-          <div class="watch-target">🎯 Buy Target: $0.50–$0.60</div>
-          <div class="watch-reason">Lido v3 launching with customizable yield strategies. Dominant liquid staking protocol. Complements ETH position — staking yield exposure without locking ETH. Watch for v3 launch date.</div>
+    <!-- SECTION 4: CHARTS -->
+    <section id="charts" class="section">
+        <h2 class="section-toggle">📈 Interactive Charts</h2>
+        <div class="collapsible-content">
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <canvas id="allocationChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="marketCapChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="fearGreedChart"></canvas>
+                </div>
+            </div>
         </div>
+    </section>
 
-      </div>
-    </div>
-  </section>
-
-  <!-- CATALYST CALENDAR -->
-  <section id="catalysts">
-    <div class="section-header" onclick="toggleSection(this)">
-      <h2>📅 Catalyst Calendar</h2>
-      <span class="toggle">▼</span>
-    </div>
-    <div class="section-body">
-      <div class="catalyst-list">
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jun 26<br>TODAY</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">$10.6B Bitcoin Quarterly Options Expiry (Deribit)</div>
-            <div class="catalyst-assets">Affects: BTC, ETH, entire market | Potential volatility reset post-expiry</div>
-          </div>
-          <div class="catalyst-impact high">High</div>
+    <!-- SECTION 5: NARRATIVE TRACKER -->
+    <section id="narrative" class="section">
+        <h2 class="section-toggle">📖 Weekly Narrative Tracker</h2>
+        <div class="collapsible-content">
+            <div class="narrative-box">
+                <div class="narrative-theme">🩸 "Capitulation &amp; Contrarian Opportunity"</div>
+                <div class="narrative-text">
+                    <p><strong>Weekly Theme:</strong> The week of June 23–29, 2026 was defined by sustained capitulation pressure across the crypto market. Bitcoin posted its second consecutive quarterly loss (-12% Q2, -22% Q1), ETH fell 10.2% on the week, and meme coins DOGE (-13.3%) and PEPE (-17.8%) bore the brunt of risk-off selling. The Fear &amp; Greed Index sits at 12 — Extreme Fear — a level historically associated with market bottoms rather than continued declines.</p>
+                    <p><strong>The Divergence Signal:</strong> Amid the fear, a critical divergence emerged: AAVE surged +21.8% on the week, and AVAX gained +4.4%, while SOL held relatively firm at -1.7%. This selective strength in DeFi and Layer-1 infrastructure suggests that sophisticated capital is rotating into fundamentally strong assets even as weaker hands exit. SharpLink Gaming's 40,000 ETH accumulation during the dip reinforces this "smart money accumulation" thesis.</p>
+                    <p><strong>Macro &amp; Regulatory Context:</strong> The EU's MiCA full implementation on July 1 creates short-term disruption but long-term clarity. The U.S. CLARITY Act faces an August deadline — passage would be a major structural catalyst. Meanwhile, geopolitical tensions (US-Iran) and upcoming macro data (NFP, CPI) keep risk appetite suppressed. BTC dominance at 55.8% confirms the classic "flight to quality within crypto" pattern.</p>
+                    <p><strong>Portfolio Implications:</strong> Your 12-asset portfolio is experiencing broad drawdowns from the Oct 2025 ATH, but the diversification is working as intended — AAVE's +21.8% partially offsets losses elsewhere. With a May 2027 hold horizon, you are positioned to benefit from the eventual recovery cycle. The Q3–Q4 2026 window is widely cited as the probable bottoming zone, which aligns with your accumulation opportunity.</p>
+                </div>
+            </div>
+            <div class="action-recommendation">
+                💡 <strong>STRATEGIC ACTION:</strong> Consider deploying your $30 pending capital in tranches. Priority targets: BTC (largest allocation, most liquid, safest), ETH (institutional accumulation signal), or AAVE (momentum outlier). Avoid adding to DOGE/PEPE at this stage — meme coins underperform in sustained fear environments. DCA into strength, not weakness.
+            </div>
         </div>
+    </section>
 
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 1<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">US ISM Manufacturing PMI Release</div>
-            <div class="catalyst-assets">Affects: All crypto (macro sentiment) | Weak data = risk-off pressure</div>
-          </div>
-          <div class="catalyst-impact medium">Medium</div>
+    <!-- SECTION 6: WATCHLIST -->
+    <section id="watchlist" class="section">
+        <h2 class="section-toggle">👀 Watchlist</h2>
+        <div class="collapsible-content">
+
+            <div class="watchlist-item">
+                <div class="watchlist-info">
+                    <h4>🟠 Bitcoin (BTC) — DCA Accumulation Zone</h4>
+                    <div class="watchlist-reason">BTC is holding the $59K–$60K support zone despite extreme fear. Two consecutive quarterly losses historically precede strong recoveries. With ETF outflows potentially nearing exhaustion and institutional interest intact, this is a strategic DCA window for your largest holding.</div>
+                </div>
+                <div class="watchlist-price">
+                    <strong style="color:#f7931a;">$59,831</strong><br>
+                    <span style="color:#b0bec5; font-size:0.85em;">Target: $56K–$60K</span>
+                </div>
+            </div>
+
+            <div class="watchlist-item">
+                <div class="watchlist-info">
+                    <h4>🔵 Ethereum (ETH) — Upgrade Catalyst + Institutional Buy</h4>
+                    <div class="watchlist-reason">ETH is down 10.2% this week but SharpLink Gaming bought 40,000 ETH during the dip. The Glamsterdam hard fork (H1 2026) and Hegotá (H2 2026) are major technical catalysts. ETH/BTC ratio at multi-year lows suggests potential for ETH outperformance in the next rally.</div>
+                </div>
+                <div class="watchlist-price">
+                    <strong style="color:#627eea;">$1,569</strong><br>
+                    <span style="color:#b0bec5; font-size:0.85em;">Target: $1,400–$1,600</span>
+                </div>
+            </div>
+
+            <div class="watchlist-item">
+                <div class="watchlist-info">
+                    <h4>🟣 Aave (AAVE) — Momentum Outlier</h4>
+                    <div class="watchlist-reason">AAVE is the standout performer this week at +21.8% — a rare positive divergence in a sea of red. DeFi protocols with real revenue and governance utility tend to lead recoveries. Watch for continuation above $100 as a breakout signal.</div>
+                </div>
+                <div class="watchlist-price">
+                    <strong style="color:#b6509e;">$92.18</strong><br>
+                    <span style="color:#b0bec5; font-size:0.85em;">Watch: $100 breakout</span>
+                </div>
+            </div>
+
+            <div class="watchlist-item">
+                <div class="watchlist-info">
+                    <h4>📊 Bitcoin ETF Flows — Institutional Sentiment Gauge</h4>
+                    <div class="watchlist-reason">June saw $4B in spot BTC ETF outflows — the worst month on record. A reversal to neutral or positive flows would signal institutional re-entry and could mark the trend bottom. Monitor daily ETF flow data (Farside Investors, Bloomberg) as a leading indicator.</div>
+                </div>
+                <div class="watchlist-price">
+                    <strong style="color:#ffd600;">Monitor</strong><br>
+                    <span style="color:#b0bec5; font-size:0.85em;">Signal: Inflow reversal</span>
+                </div>
+            </div>
+
+            <div class="watchlist-item">
+                <div class="watchlist-info">
+                    <h4>🔴 Avalanche (AVAX) — Relative Strength</h4>
+                    <div class="watchlist-reason">AVAX is one of only two portfolio assets posting positive 7-day returns (+4.35%), showing relative strength in a down market. This resilience could indicate accumulation. Watch for a sustained move above $7 as confirmation of trend reversal.</div>
+                </div>
+                <div class="watchlist-price">
+                    <strong style="color:#e84142;">$6.54</strong><br>
+                    <span style="color:#b0bec5; font-size:0.85em;">Watch: $7.00 breakout</span>
+                </div>
+            </div>
+
         </div>
+    </section>
 
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 2<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">SUI Token Unlock (0.91% of supply)</div>
-            <div class="catalyst-assets">Affects: SUI | Minor supply pressure; watch for dip-buy opportunity</div>
-          </div>
-          <div class="catalyst-impact low">Low</div>
+    <!-- SECTION 7: CATALYST CALENDAR -->
+    <section id="catalysts" class="section">
+        <h2 class="section-toggle">📅 Catalyst Calendar</h2>
+        <div class="collapsible-content">
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🔴 July 1, 2026 — IMMINENT</div>
+                <div class="catalyst-event">EU MiCA Full Implementation Deadline</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> All (BTC, ETH, XRP, BNB most directly)<br>
+                    <strong>Impact:</strong> High — Only 17% of European firms achieved MiCA authorization. Binance suspended EU services. Compliant platforms (Kraken, Coinbase) gain market share. Short-term disruption, long-term structural positive for regulated assets.<br>
+                    <strong>Action:</strong> No action needed — your Kraken holdings are on a compliant platform. Monitor for any service disruptions.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🟡 Early July 2026 — This Week</div>
+                <div class="catalyst-event">U.S. Nonfarm Payrolls &amp; Unemployment Data</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> All (macro-sensitive)<br>
+                    <strong>Impact:</strong> High — Strong jobs data could reinforce Fed hawkishness and pressure risk assets. Weak data could signal rate cut expectations, potentially bullish for crypto. This is the most immediate market-moving event.<br>
+                    <strong>Action:</strong> Avoid large purchases immediately before the release. Wait for the data reaction before deploying capital.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🟡 July–August 2026</div>
+                <div class="catalyst-event">U.S. CLARITY Act — Senate Vote Window</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> All (BTC, ETH, SOL, XRP most directly)<br>
+                    <strong>Impact:</strong> Very High — Passage before August recess would be a landmark structural catalyst, formally clarifying SEC/CFTC jurisdiction. Failure to pass could delay legislation until 2030. Watch for Senate floor vote scheduling.<br>
+                    <strong>Action:</strong> Passage = strong buy signal for the entire portfolio. Monitor legislative news closely.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🟢 H1 2026 (Imminent)</div>
+                <div class="catalyst-event">Ethereum Glamsterdam Hard Fork</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> ETH (direct), SOL, AVAX, ADA (competitive L1s, indirect)<br>
+                    <strong>Impact:</strong> High — Introduces enshrined Proposer-Builder Separation (ePBS) and Block-Level Access Lists (BALs), enabling parallel execution and targeting 100–200M gas limits. Currently in final testing. Upgrade hype typically drives ETH price appreciation in the weeks prior.<br>
+                    <strong>Action:</strong> Positive catalyst for ETH. Consider accumulating before upgrade announcement date is confirmed.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🟢 H2 2026 (Oct–Dec)</div>
+                <div class="catalyst-event">Ethereum Hegotá Upgrade (Verkle Trees + Stateless Clients)</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> ETH<br>
+                    <strong>Impact:</strong> Medium-High — Introduces Verkle Trees for stateless clients, dramatically reducing node hardware requirements and enhancing decentralization. Also includes FOCIL for censorship resistance. Part of Ethereum's multi-stage scaling roadmap.<br>
+                    <strong>Action:</strong> Long-term bullish for ETH. Validates continued protocol development and institutional thesis.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🔵 Weekly (Every Monday)</div>
+                <div class="catalyst-event">U.S. Spot Bitcoin &amp; Crypto ETF Flow Reports</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> BTC, ETH, SOL, XRP (dedicated ETFs exist)<br>
+                    <strong>Impact:</strong> High — After June's record $4B in BTC ETF outflows, weekly flow data is the most important institutional sentiment indicator. A reversal to neutral or positive flows = institutional re-entry signal.<br>
+                    <strong>Action:</strong> Track via Farside Investors or Bloomberg. Significant inflows = strong buy confirmation.
+                </div>
+            </div>
+
+            <div class="catalyst-item">
+                <div class="catalyst-date">🔵 Ongoing</div>
+                <div class="catalyst-event">SBI Holdings Acquires Bitbank ($289M) — Japan Crypto Consolidation</div>
+                <div class="catalyst-details">
+                    <strong>Affected Assets:</strong> BTC, ETH, XRP (major Japanese trading pairs)<br>
+                    <strong>Impact:</strong> Medium — Signals continued institutional consolidation in Asian crypto markets. Japan is a major XRP market. Increased institutional infrastructure in Asia supports long-term adoption narrative.<br>
+                    <strong>Action:</strong> Positive long-term signal for XRP and major assets. No immediate action required.
+                </div>
+            </div>
+
         </div>
+    </section>
 
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 2<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">US Unemployment Data Release</div>
-            <div class="catalyst-assets">Affects: All crypto (macro) | Strong jobs = hawkish Fed fears; weak = rate cut hopes</div>
-          </div>
-          <div class="catalyst-impact medium">Medium</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 14<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">US CPI Inflation Data Release</div>
-            <div class="catalyst-assets">Affects: BTC, ETH, all assets | Key Fed rate cut signal; major volatility trigger</div>
-          </div>
-          <div class="catalyst-impact high">High</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 16<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">Arbitrum (ARB) Token Unlock (0.93% of supply)</div>
-            <div class="catalyst-assets">Affects: ARB (watchlist) | Potential dip-buy entry point</div>
-          </div>
-          <div class="catalyst-impact low">Low</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 23<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">Pragma Lisbon 2026 — ETHGlobal Web3 Conference</div>
-            <div class="catalyst-assets">Affects: ETH, L2s, DeFi | Protocol announcements, ecosystem news</div>
-          </div>
-          <div class="catalyst-impact medium">Medium</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Jul 29<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">Federal Reserve Interest Rate Decision (FOMC)</div>
-            <div class="catalyst-assets">Affects: Entire crypto market | Most critical macro catalyst of July; rate cut = bullish</div>
-          </div>
-          <div class="catalyst-impact high">High</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">Q3<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">Solana Alpenglow Mainnet Activation (Target)</div>
-            <div class="catalyst-assets">Affects: SOL | 100ms finality upgrade — major technical milestone; bullish catalyst</div>
-          </div>
-          <div class="catalyst-impact high">High</div>
-        </div>
-
-        <div class="catalyst-item">
-          <div class="catalyst-date">H1<br>2026</div>
-          <div class="catalyst-info">
-            <div class="catalyst-name">Ethereum Glamsterdam Hard Fork (Final Testing)</div>
-            <div class="catalyst-assets">Affects: ETH, AAVE, LINK, DeFi | Parallel execution, 200M gas limit — major ETH upgrade</div>
-          </div>
-          <div class="catalyst-impact high">High</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-</div><!-- /container -->
-
-<footer>
-  <p>⚡ Crypto Weekly Pulse &mdash; Generated June 26, 2026 | Data: CoinGecko, Alternative.me, Web Sources</p>
-  <p style="margin-top:0.4rem;">Portfolio: ~$315 | Risk: Moderately Aggressive | Hold Until: May 1, 2027 | Platforms: Kraken · Uphold · Ledger</p>
-  <p style="margin-top:0.4rem;font-size:0.72rem;color:#546e7a;">⚠️ Not financial advice. For personal tracking only. Always DYOR.</p>
-</footer>
+</div><!-- end container -->
 
 <script>
-// ─── COLLAPSIBLE SECTIONS ───────────────────────────────────────────────────
-function toggleSection(header) {
-  header.classList.toggle('collapsed');
-  const body = header.nextElementSibling;
-  body.classList.toggle('collapsed');
-}
-
-// ─── CHART DEFAULTS ─────────────────────────────────────────────────────────
+// ============================================================
+// Chart.js Global Defaults
+// ============================================================
 Chart.defaults.color = '#b0bec5';
-Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
 
-// ─── CHART 1: PORTFOLIO ALLOCATION DOUGHNUT ─────────────────────────────────
-const ctxAlloc = document.getElementById('chartAllocation').getContext('2d');
-new Chart(ctxAlloc, {
-  type: 'doughnut',
-  data: {
-    labels: ['BTC','ETH','SOL','BNB','XRP','AVAX','LINK','AAVE','ADA','SUI','DOGE','PEPE'],
-    datasets: [{
-      data: [28.0, 24.0, 11.0, 6.0, 5.5, 5.0, 4.5, 4.0, 4.0, 4.0, 2.5, 1.5],
-      backgroundColor: [
-        '#f7931a','#627eea','#00ffa3','#f3ba2f','#00aae4',
-        '#e84142','#2a5ada','#b6509e','#0033ad','#4da2ff','#c2a633','#3a9d3f'
-      ],
-      borderColor: '#1a1a2e',
-      borderWidth: 2,
-      hoverOffset: 8
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '62%',
-    plugins: {
-      legend: {
-        position: 'right',
-        labels: { boxWidth: 12, padding: 8, font: { size: 11 } }
-      },
-      tooltip: {
-        callbacks: {
-          label: ctx => ` ${ctx.label}: ${ctx.parsed}%`
-        }
-      }
-    }
-  }
-});
-
-// ─── CHART 2: MARKET CAP HORIZONTAL BAR ─────────────────────────────────────
-const ctxMcap = document.getElementById('chartMcap').getContext('2d');
-new Chart(ctxMcap, {
-  type: 'bar',
-  data: {
-    labels: ['BTC','ETH','BNB','XRP','SOL','DOGE','LINK','ADA','SUI','AVAX','AAVE','PEPE'],
-    datasets: [{
-      label: 'Market Cap (B USD)',
-      data: [1182.43, 184.52, 74.89, 63.37, 38.68, 11.34, 5.30, 5.21, 2.69, 2.60, 1.25, 0.97],
-      backgroundColor: [
-        '#f7931a','#627eea','#f3ba2f','#00aae4','#00ffa3',
-        '#c2a633','#2a5ada','#0033ad','#4da2ff','#e84142','#b6509e','#3a9d3f'
-      ],
-      borderRadius: 4,
-      borderSkipped: false
-    }]
-  },
-  options: {
-    indexAxis: 'y',
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ` $${ctx.parsed.x.toFixed(2)}B`
-        }
-      }
+// ============================================================
+// Chart 1: Portfolio Allocation Doughnut
+// ============================================================
+const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+new Chart(allocationCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['BTC','ETH','SOL','BNB','XRP','AAVE','LINK','ADA','SUI','AVAX','DOGE','PEPE'],
+        datasets: [{
+            label: 'Portfolio Allocation %',
+            data: [30, 25, 11, 6, 5, 5, 4, 4, 4, 3, 2, 1],
+            backgroundColor: [
+                '#f7931a','#627eea','#00ffa3','#f3ba2f','#00aae4',
+                '#b6509e','#2a5ada','#0033ad','#4da2ff','#e84142',
+                '#c2a633','#3a9d3f'
+            ],
+            borderWidth: 2,
+            borderColor: '#1a1a2e'
+        }]
     },
-    scales: {
-      x: {
-        grid: { color: 'rgba(255,255,255,0.05)' },
-        ticks: { callback: v => v >= 1000 ? `$${(v/1000).toFixed(1)}T` : `$${v}B` }
-      },
-      y: {
-        grid: { display: false },
-        ticks: { font: { size: 11 } }
-      }
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right',
+                labels: { padding: 12, font: { size: 11 } }
+            },
+            title: {
+                display: true,
+                text: 'Portfolio Allocation by Value (%)',
+                font: { size: 15, weight: 'bold' },
+                color: '#00d2ff',
+                padding: { bottom: 15 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        return ' ' + ctx.label + ': ' + ctx.parsed + '%';
+                    }
+                }
+            }
+        }
     }
-  }
 });
 
-// ─── CHART 3: WEEKLY PERFORMANCE VERTICAL BAR ───────────────────────────────
-const ctxPerf = document.getElementById('chartPerformance').getContext('2d');
-const perfData = [-6.25, -10.29, -4.21, -4.42, -11.37, -3.66, -11.27, 11.25, -14.64, -8.53, -12.30, -19.51];
-const perfColors = perfData.map(v => v >= 0 ? 'rgba(0,230,118,0.8)' : 'rgba(255,23,68,0.8)');
-new Chart(ctxPerf, {
-  type: 'bar',
-  data: {
-    labels: ['BTC','ETH','SOL','BNB','XRP','AVAX','LINK','AAVE','ADA','SUI','DOGE','PEPE'],
-    datasets: [{
-      label: '7d Change %',
-      data: perfData,
-      backgroundColor: perfColors,
-      borderRadius: 4,
-      borderSkipped: false
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ` ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`
-        }
-      }
+// ============================================================
+// Chart 2: Market Cap Horizontal Bar
+// ============================================================
+const marketCapCtx = document.getElementById('marketCapChart').getContext('2d');
+new Chart(marketCapCtx, {
+    type: 'bar',
+    data: {
+        labels: ['BTC','ETH','BNB','XRP','SOL','DOGE','LINK','ADA','AVAX','SUI','AAVE','PEPE'],
+        datasets: [{
+            label: 'Market Cap (Billions USD)',
+            data: [1199.6, 189.4, 74.3, 65.2, 42.1, 11.2, 5.45, 5.37, 2.82, 2.76, 1.40, 0.98],
+            backgroundColor: [
+                '#f7931a','#627eea','#f3ba2f','#00aae4','#00ffa3',
+                '#c2a633','#2a5ada','#0033ad','#e84142','#4da2ff',
+                '#b6509e','#3a9d3f'
+            ],
+            borderWidth: 0,
+            borderRadius: 4
+        }]
     },
-    scales: {
-      x: {
-        grid: { display: false },
-        ticks: { font: { size: 10 } }
-      },
-      y: {
-        grid: { color: 'rgba(255,255,255,0.05)' },
-        ticks: { callback: v => `${v}%` }
-      }
-    }
-  }
-});
-
-// ─── CHART 4: FEAR & GREED LINE CHART ───────────────────────────────────────
-const ctxFng = document.getElementById('chartFng').getContext('2d');
-const fngLabels = ["May 02","May 03","May 04","May 05","May 06","May 07","May 08","May 09","May 10","May 11","May 12","May 13","May 14","May 15","May 16","May 17","May 18","May 19","May 20","May 21","May 22","May 23","May 24","May 25","May 26","May 27","May 28","May 29","May 30","May 31","Jun 01","Jun 02","Jun 03","Jun 04","Jun 05","Jun 06","Jun 07","Jun 08","Jun 09","Jun 10","Jun 11","Jun 12","Jun 13","Jun 14","Jun 15","Jun 16","Jun 17","Jun 18","Jun 19","Jun 20","Jun 21","Jun 22","Jun 23","Jun 24","Jun 25","Jun 26"];
-const fngValues = [39,47,40,50,46,47,38,38,47,48,49,42,34,43,31,27,28,25,27,29,28,28,25,30,34,25,22,23,23,28,29,23,11,12,12,12,12,8,10,9,12,12,13,18,20,23,22,15,14,23,23,20,23,17,12,13];
-
-// Color each point based on value
-const fngPointColors = fngValues.map(v => {
-  if (v <= 24) return '#ff1744';
-  if (v <= 44) return '#ff6d00';
-  if (v <= 54) return '#ffd600';
-  if (v <= 74) return '#76ff03';
-  return '#00e676';
-});
-
-new Chart(ctxFng, {
-  type: 'line',
-  data: {
-    labels: fngLabels,
-    datasets: [{
-      label: 'Fear & Greed Index',
-      data: fngValues,
-      borderColor: '#00d2ff',
-      backgroundColor: 'rgba(0,210,255,0.08)',
-      borderWidth: 2,
-      pointRadius: 2,
-      pointHoverRadius: 5,
-      pointBackgroundColor: fngPointColors,
-      fill: true,
-      tension: 0.3
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => {
-            const v = ctx.parsed.y;
-            let label = v <= 24 ? 'Extreme Fear' : v <= 44 ? 'Fear' : v <= 54 ? 'Neutral' : v <= 74 ? 'Greed' : 'Extreme Greed';
-            return ` ${v} — ${label}`;
-          }
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Market Capitalization Comparison (USD Billions)',
+                font: { size: 15, weight: 'bold' },
+                color: '#00d2ff',
+                padding: { bottom: 15 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        return ' $' + ctx.parsed.x.toFixed(1) + 'B';
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                ticks: { callback: v => '$' + v + 'B' }
+            },
+            y: { grid: { display: false } }
         }
-      }
+    }
+});
+
+// ============================================================
+// Chart 3: Weekly Performance Vertical Bar
+// ============================================================
+const perfData = [-6.61, -10.19, -1.67, 4.35, 21.77, -7.53, -8.81, -9.97, -3.50, -6.85, -13.26, -17.76];
+const perfLabels = ['BTC','ETH','SOL','AVAX','AAVE','XRP','LINK','ADA','SUI','BNB','DOGE','PEPE'];
+const perfColors = perfData.map(v => v >= 0 ? '#00e676' : '#ff1744');
+
+const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+new Chart(performanceCtx, {
+    type: 'bar',
+    data: {
+        labels: perfLabels,
+        datasets: [{
+            label: '7-Day Performance (%)',
+            data: perfData,
+            backgroundColor: perfColors,
+            borderWidth: 0,
+            borderRadius: 4
+        }]
     },
-    scales: {
-      x: {
-        grid: { color: 'rgba(255,255,255,0.04)' },
-        ticks: {
-          maxTicksLimit: 8,
-          font: { size: 10 }
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Weekly Performance — 7-Day % Change (Jun 23–29)',
+                font: { size: 15, weight: 'bold' },
+                color: '#00d2ff',
+                padding: { bottom: 15 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        const v = ctx.parsed.y;
+                        return ' ' + (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                ticks: { callback: v => v + '%' }
+            },
+            x: { grid: { display: false } }
         }
-      },
-      y: {
-        min: 0, max: 100,
-        grid: { color: 'rgba(255,255,255,0.05)' },
-        ticks: {
-          stepSize: 25,
-          callback: v => {
-            if (v === 0) return 'Extreme Fear';
-            if (v === 25) return 'Fear';
-            if (v === 50) return 'Neutral';
-            if (v === 75) return 'Greed';
-            if (v === 100) return 'Extreme Greed';
-            return v;
-          }
-        }
-      }
     }
-  }
+});
+
+// ============================================================
+// Chart 4: Fear & Greed History Line Chart (56 days)
+// ============================================================
+const fgLabels = ["May 05","May 06","May 07","May 08","May 09","May 10","May 11","May 12","May 13","May 14","May 15","May 16","May 17","May 18","May 19","May 20","May 21","May 22","May 23","May 24","May 25","May 26","May 27","May 28","May 29","May 30","May 31","Jun 01","Jun 02","Jun 03","Jun 04","Jun 05","Jun 06","Jun 07","Jun 08","Jun 09","Jun 10","Jun 11","Jun 12","Jun 13","Jun 14","Jun 15","Jun 16","Jun 17","Jun 18","Jun 19","Jun 20","Jun 21","Jun 22","Jun 23","Jun 24","Jun 25","Jun 26","Jun 27","Jun 28","Jun 29"];
+const fgValues = [50,46,47,38,38,47,48,49,42,34,43,31,27,28,25,27,29,28,28,25,30,34,25,22,23,23,28,29,23,11,12,12,12,12,8,10,9,12,12,13,18,20,23,22,15,14,23,23,20,23,17,12,13,15,18,12];
+
+// Color points by zone
+const fgPointColors = fgValues.map(v => {
+    if (v <= 25) return '#ff1744';
+    if (v <= 45) return '#ff9800';
+    if (v <= 55) return '#ffd600';
+    if (v <= 75) return '#4caf50';
+    return '#00e676';
+});
+
+const fearGreedCtx = document.getElementById('fearGreedChart').getContext('2d');
+new Chart(fearGreedCtx, {
+    type: 'line',
+    data: {
+        labels: fgLabels,
+        datasets: [{
+            label: 'Fear & Greed Index',
+            data: fgValues,
+            borderColor: '#ff9800',
+            backgroundColor: 'rgba(255,152,0,0.08)',
+            borderWidth: 2.5,
+            tension: 0.35,
+            fill: true,
+            pointRadius: 3,
+            pointBackgroundColor: fgPointColors,
+            pointBorderColor: '#1a1a2e',
+            pointBorderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            title: {
+                display: true,
+                text: 'Fear & Greed Index — Last 56 Days (May 5 – Jun 29)',
+                font: { size: 15, weight: 'bold' },
+                color: '#00d2ff',
+                padding: { bottom: 15 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        const v = ctx.parsed.y;
+                        let zone = v <= 25 ? 'Extreme Fear' : v <= 45 ? 'Fear' : v <= 55 ? 'Neutral' : v <= 75 ? 'Greed' : 'Extreme Greed';
+                        return ' ' + v + ' — ' + zone;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                min: 0,
+                max: 100,
+                grid: { color: 'rgba(255,255,255,0.08)' },
+                ticks: {
+                    stepSize: 25,
+                    callback: function(v) {
+                        if (v === 0) return '0 (Extreme Fear)';
+                        if (v === 25) return '25 (Fear)';
+                        if (v === 50) return '50 (Neutral)';
+                        if (v === 75) return '75 (Greed)';
+                        if (v === 100) return '100 (Extreme Greed)';
+                        return v;
+                    }
+                }
+            },
+            x: {
+                grid: { display: false },
+                ticks: {
+                    maxTicksLimit: 10,
+                    maxRotation: 45
+                }
+            }
+        }
+    }
+});
+
+// ============================================================
+// Smooth Scrolling Navigation
+// ============================================================
+document.querySelectorAll('nav a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// ============================================================
+// Collapsible Sections
+// ============================================================
+document.querySelectorAll('.section-toggle').forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        if (content && content.classList.contains('collapsible-content')) {
+            content.classList.toggle('hidden');
+            this.classList.toggle('collapsed');
+        }
+    });
 });
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"f0f03d0605bf45f1a3b17cf7d5e6861f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
